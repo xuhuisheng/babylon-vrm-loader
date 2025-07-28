@@ -384,6 +384,9 @@ export class VRMManager {
             const node = this.scene.transformNodes[index];
             // ポインタが登録されていないものは省略
             if (!node || !node.metadata || !node.metadata.gltf || !node.metadata.gltf.pointers || node.metadata.gltf.pointers.length === 0) {
+                node.metadata = node._internalMetadata
+            }
+            if (!node || !node.metadata || !node.metadata.gltf || !node.metadata.gltf.pointers || node.metadata.gltf.pointers.length === 0) {
                 continue;
             }
             for (const pointer of node.metadata.gltf.pointers) {
@@ -409,6 +412,9 @@ export class VRMManager {
                 continue;
             }
             // ポインタが登録されていないものは省略
+            if (!mesh || !mesh.metadata || !mesh.metadata.gltf || !mesh.metadata.gltf.pointers || mesh.metadata.gltf.pointers.length === 0) {
+                mesh.metadata = mesh._internalMetadata
+            }
             if (!mesh || !mesh.metadata || !mesh.metadata.gltf || !mesh.metadata.gltf.pointers || mesh.metadata.gltf.pointers.length === 0) {
                 continue;
             }
