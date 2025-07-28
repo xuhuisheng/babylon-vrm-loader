@@ -18,44 +18,44 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@babylonjs/core@^5.19.0":
-  version "5.25.0"
-  resolved "https://registry.yarnpkg.com/@babylonjs/core/-/core-5.25.0.tgz#aece076add1ef85c28cf449dfca6caa80743c5c9"
-  integrity sha512-pjUCrT5OPuJ0UU3bPtzovkRK+Xxl9bd1pIPG7aulqsC2Ci/hxiDNL2SwQnX9J/lcV5x6LTDyMUJ0IXSW8W+2sw==
+"@babylonjs/core@^8.18.0":
+  version "8.18.0"
+  resolved "https://registry.npmmirror.com/@babylonjs/core/-/core-8.18.0.tgz#d5a1c02a5eb04f8dbbdbcd2b9530f458185565a4"
+  integrity sha512-eBXbOCRX7i5H/lNeqJSe8nsC9d9eIp4i/3Okzc+zwY1bi7HKFf3HT/bjut0y5xd4cSAKRfty5JMJsDBl12n0rg==
 
-"@babylonjs/gui-editor@^5.19.0":
-  version "5.25.0"
-  resolved "https://registry.yarnpkg.com/@babylonjs/gui-editor/-/gui-editor-5.25.0.tgz#57fe641a8806a89cd72679d545c0b85ab68b0420"
-  integrity sha512-OAvVuDzSOns26FbUU+TUncb/7RFJuULxC9xg8JxNjHoXKONOXcKAY7m7ATeJrvS4FOX6RGSZ9QGemJzGMu6GZg==
+"@babylonjs/gui-editor@^8.18.0":
+  version "8.18.0"
+  resolved "https://registry.npmmirror.com/@babylonjs/gui-editor/-/gui-editor-8.18.0.tgz#f1a8050bc38f28c769381aa19f0ef207bd6cc55b"
+  integrity sha512-M9WJtLwoTmeLVNkjTabSFycOAZ3jFbCbFh1Yq5ZYzeLF9EkZQT6MkrQjGHYgbzSVurhCNEHem7TGLLNtOb+HLw==
 
-"@babylonjs/gui@^5.19.0":
-  version "5.25.0"
-  resolved "https://registry.yarnpkg.com/@babylonjs/gui/-/gui-5.25.0.tgz#e7f697c3c64ba5aa5a23d7ad449ea416054b2776"
-  integrity sha512-1yd7PAmyYwyL1khBo0qzb32NUxxkN3Kw15BPsgkN6l+qlu7mQug3GFPEH8eyBHLLZgVsFwrZK8fN7LPRJqQNrg==
+"@babylonjs/gui@^8.18.0":
+  version "8.18.0"
+  resolved "https://registry.npmmirror.com/@babylonjs/gui/-/gui-8.18.0.tgz#cbcf384fae05fea40e8db6e70e04b376f0b1173d"
+  integrity sha512-3+SZFkryCR/Hd7DO2HdAkFaxbhC7t99D3dXuy8YvxrYsKai0VasbYdzFNu7gh+pwUxoJKeGA6ajtYTHeuayn3w==
 
-"@babylonjs/inspector@^5.19.0":
-  version "5.25.0"
-  resolved "https://registry.yarnpkg.com/@babylonjs/inspector/-/inspector-5.25.0.tgz#3c3953fdc0a4db3d422899c011894d724aaec5c8"
-  integrity sha512-E5PKLVasE9wRfyAM8t/+2KfbS0UwJvnOOFNkHOQS/Sajk8xhiH/0sIqEXHw2DP24z7r4g0/PZK3zmXtEulzyFg==
+"@babylonjs/inspector@^8.18.0":
+  version "8.18.0"
+  resolved "https://registry.npmmirror.com/@babylonjs/inspector/-/inspector-8.18.0.tgz#8d060e4fd333436f808802e858aae3f4c074951f"
+  integrity sha512-D7iMGO4KmqgwqyJ2KjyMSLbyX89FMiaVi/n8ctMDirCPqXmxfPTzo3w6EF4G7btydrfBDG0W6sOeoOJ6srZn3Q==
   dependencies:
     "@fortawesome/fontawesome-svg-core" "^6.1.0"
     "@fortawesome/free-regular-svg-icons" "^6.0.0"
     "@fortawesome/free-solid-svg-icons" "^6.0.0"
 
-"@babylonjs/loaders@^5.19.0":
-  version "5.25.0"
-  resolved "https://registry.yarnpkg.com/@babylonjs/loaders/-/loaders-5.25.0.tgz#fd7381cbd787973e14e22103bc5c88eaf4214220"
-  integrity sha512-JMSjypYIRRzyBfvBfvjNsOfnU5ZxPrJKg8EvYJs3DBY1PYfkxvZdh22iJodLo5qFBcEe7CvSbmzKGVbb3dw98A==
+"@babylonjs/loaders@^8.18.0":
+  version "8.18.0"
+  resolved "https://registry.npmmirror.com/@babylonjs/loaders/-/loaders-8.18.0.tgz#3f48eff719ddf2fa2770abb9e0442412f450361b"
+  integrity sha512-Siqf/dGzCYJBWGOVQOTvfAxMW7/xrs+rmPXVpDwIOpJagqksjnzjcZhX4aFaEetrTdOyWy/8J44Ak98DBeInOQ==
 
-"@babylonjs/materials@^5.19.0":
-  version "5.25.0"
-  resolved "https://registry.yarnpkg.com/@babylonjs/materials/-/materials-5.25.0.tgz#1b141229e82f6a5229d92f2c49a256c9ebad5339"
-  integrity sha512-aP+dvVgkGT3xN4LbdoICEie/MA0j0G6FNYAMd8asAIwoQcb4v6IwdOg8m894TNVwGExgUw2rWYGMtr4fpnvieA==
+"@babylonjs/materials@^8.18.0":
+  version "8.18.0"
+  resolved "https://registry.npmmirror.com/@babylonjs/materials/-/materials-8.18.0.tgz#edadd57bfee1f6eef3407e506885af9a9551938d"
+  integrity sha512-rcQdn4cFtCc8NO/3L69vUU5ITkci5nfobVgHEo9eI4Z1UH79Dw8hQ6VADDWdaYURLYCvQsY/tpjXGVddr7CDuw==
 
-"@babylonjs/serializers@^5.19.0":
-  version "5.25.0"
-  resolved "https://registry.yarnpkg.com/@babylonjs/serializers/-/serializers-5.25.0.tgz#2f23500b22773094ee943c5fa08cfd518d0b0c94"
-  integrity sha512-eMQvWNV+D8ZHlS2DxsfSBDLIb0GzxvTsbjf4V3KVT0uxTzWbF52Fwzi9KpPGXNnUlcCt6bMMfzGJxL5luX9cUw==
+"@babylonjs/serializers@^8.18.0":
+  version "8.18.0"
+  resolved "https://registry.npmmirror.com/@babylonjs/serializers/-/serializers-8.18.0.tgz#3e73f159f3b940e2a489abd736fae89c6a79b082"
+  integrity sha512-13trG2327A7OUk186IaqUeyntJk+09PfEJ24a0m0fcWOv52M1pHj0RgNIAuKbRzrBKUGwBv3aLJGs0V4sNhcWA==
 
 "@colors/colors@1.5.0":
   version "1.5.0"
@@ -1295,15 +1295,13 @@ async@^2.6.1:
   dependencies:
     lodash "^4.17.14"
 
-babylon-mtoon-material@^5.0.0:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/babylon-mtoon-material/-/babylon-mtoon-material-5.1.1.tgz#50d91d48d1446c25373e5693c85e9b793066126d"
-  integrity sha512-u6R3nKkeXTP9S4TP6ntbVAMxAEZ8S89jiOSj39iW5WMaXOEUcGEbEAUa6crhR4621sDxt5keHje33BNFb6K1ew==
+"babylon-mtoon-material@file:../babylon-mtoon-material":
+  version "8.0.0"
 
-babylonjs-gltf2interface@^5.0.0:
-  version "5.25.0"
-  resolved "https://registry.yarnpkg.com/babylonjs-gltf2interface/-/babylonjs-gltf2interface-5.25.0.tgz#2c425a3797a128e8e4f721390c36810b03cfbb53"
-  integrity sha512-udvZZgXZoLsrBXG2DP+QL+2S4PFGUND+MRRhYjLtHn/cYp+Y4FqIedAK0C8OasM/E262uq1dFK0nrqnZ/rQZ5A==
+babylonjs-gltf2interface@^8.18.0:
+  version "8.18.0"
+  resolved "https://registry.npmmirror.com/babylonjs-gltf2interface/-/babylonjs-gltf2interface-8.18.0.tgz#a9b2cfa69361d37d539ac74f4283da25a8f1d2f5"
+  integrity sha512-+ajx9T0S41gs89mFheZNr3LUvIFaII1FGtWaGECwBFBMv/iaOB8Tby8u8m6kYYaHa9fxDIuh9h+Yg2OVFrHFBA==
 
 balanced-match@^1.0.0:
   version "1.0.2"

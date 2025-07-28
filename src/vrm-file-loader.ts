@@ -6,7 +6,10 @@ import { GLTFFileLoader } from '@babylonjs/loaders/glTF/glTFFileLoader';
  * 拡張子を変更しただけ
  */
 export class VRMFileLoader extends GLTFFileLoader {
-    public name = 'vrm';
+}
+
+export class VRMFileLoaderPlugin {
+    public name = "vrm";
     public extensions = {
         '.vrm': { isBinary: true },
         '.vci': { isBinary: true },
@@ -18,5 +21,5 @@ export class VRMFileLoader extends GLTFFileLoader {
 }
 
 if (SceneLoader) {
-    SceneLoader.RegisterPlugin(new VRMFileLoader());
+    SceneLoader.RegisterPlugin(new VRMFileLoaderPlugin());
 }
