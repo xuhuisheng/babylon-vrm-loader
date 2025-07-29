@@ -12,6 +12,7 @@ export class VRMFileLoaderPlugin {
     public name = "vrm";
     public extensions = {
         '.vrm': { isBinary: true },
+        '.vrma': { isBinary: true },
         '.vci': { isBinary: true },
     };
 
