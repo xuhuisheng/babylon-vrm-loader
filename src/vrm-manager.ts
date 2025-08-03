@@ -1,117 +1,28 @@
 import { Vector3 } from '@babylonjs/core/Maths/math';
 import type { Mesh } from '@babylonjs/core/Meshes/mesh';
 import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-import type { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
+// import type { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
 import type { Scene } from '@babylonjs/core/scene';
 import type { Nullable } from '@babylonjs/core/types';
 import { SpringBoneController } from './secondary-animation/spring-bone-controller';
 import { HumanoidBone } from './humanoid-bone';
 import type { IVRM } from './vrm-interfaces';
 import { MaterialValueBindingMerger } from './material-value-binding-merger';
-
-interface IsBinaryMap {
-    [morphName: string]: boolean;
-}
-
-interface MorphTargetSetting {
-    target: MorphTarget;
-    weight: number;
-}
-
-interface MorphTargetMap {
-    [morphName: string]: MorphTargetSetting[];
-}
-
-interface MaterialValueBindingMergerMap {
-    [morphName: string]: MaterialValueBindingMerger;
-}
-
-interface TransformNodeMap {
-    [humanBoneName: string]: TransformNode;
-}
-
-interface TransformNodeCache {
-    [nodeIndex: number]: TransformNode;
-}
-
-interface MeshCache {
-    [meshIndex: number]: Mesh[];
-}
-
-/**
- * Unity Humanoid Bone 名
- */
-export type HumanBoneName =
-    | 'hips'
-    | 'leftUpperLeg'
-    | 'rightUpperLeg'
-    | 'leftLowerLeg'
-    | 'rightLowerLeg'
-    | 'leftFoot'
-    | 'rightFoot'
-    | 'spine'
-    | 'chest'
-    | 'neck'
-    | 'head'
-    | 'leftShoulder'
-    | 'rightShoulder'
-    | 'leftUpperArm'
-    | 'rightUpperArm'
-    | 'leftLowerArm'
-    | 'rightLowerArm'
-    | 'leftHand'
-    | 'rightHand'
-    | 'leftToes'
-    | 'rightToes'
-    | 'leftEye'
-    | 'rightEye'
-    | 'jaw'
-    | 'leftThumbProximal'
-    | 'leftThumbIntermediate'
-    | 'leftThumbDistal'
-    | 'leftIndexProximal'
-    | 'leftIndexIntermediate'
-    | 'leftIndexDistal'
-    | 'leftMiddleProximal'
-    | 'leftMiddleIntermediate'
-    | 'leftMiddleDistal'
-    | 'leftRingProximal'
-    | 'leftRingIntermediate'
-    | 'leftRingDistal'
-    | 'leftLittleProximal'
-    | 'leftLittleIntermediate'
-    | 'leftLittleDistal'
-    | 'rightThumbProximal'
-    | 'rightThumbIntermediate'
-    | 'rightThumbDistal'
-    | 'rightIndexProximal'
-    | 'rightIndexIntermediate'
-    | 'rightIndexDistal'
-    | 'rightMiddleProximal'
-    | 'rightMiddleIntermediate'
-    | 'rightMiddleDistal'
-    | 'rightRingProximal'
-    | 'rightRingIntermediate'
-    | 'rightRingDistal'
-    | 'rightLittleProximal'
-    | 'rightLittleIntermediate'
-    | 'rightLittleDistal'
-    | 'upperChest'
-    | string;
+import { IsBinaryMap, MorphTargetMap, MaterialValueBindingMergerMap, TransformNodeMap, TransformNodeCache, MeshCache, HumanBoneName } from './vrm-interfaces-defines';
 
 /**
  * VRM キャラクターを動作させるためのマネージャ
  */
 export class VRMManager {
-    private isBinaryMorphMap: IsBinaryMap = {};
-    private morphTargetMap: MorphTargetMap = {};
-    private materialValueBindingMergerMap: MaterialValueBindingMergerMap = {};
-    private presetMorphTargetMap: MorphTargetMap = {};
-    private transformNodeMap: TransformNodeMap = {};
-    private transformNodeCache: TransformNodeCache = {};
-    private meshCache: MeshCache = {};
-    private _humanoidBone: HumanoidBone;
-    private _rootMesh: Mesh;
+    protected isBinaryMorphMap: IsBinaryMap = {};
+    protected morphTargetMap: MorphTargetMap = {};
+    protected materialValueBindingMergerMap: MaterialValueBindingMergerMap = {};
+    protected presetMorphTargetMap: MorphTargetMap = {};
+    protected transformNodeMap: TransformNodeMap = {};
+    protected transformNodeCache: TransformNodeCache = {};
+    protected meshCache: MeshCache = {};
+    protected _humanoidBone: HumanoidBone;
+    protected _rootMesh: Mesh;
 
     /**
      * Secondary Animation として定義されている VRM Spring Bone のコントローラ
@@ -129,9 +40,9 @@ export class VRMManager {
     public constructor(
         public readonly ext: IVRM,
         public readonly scene: Scene,
-        private readonly meshesFrom: number,
-        private readonly transformNodesFrom: number,
-        private readonly materialsNodesFrom: number
+        protected readonly meshesFrom: number,
+        protected readonly transformNodesFrom: number,
+        protected readonly materialsNodesFrom: number
     ) {
         this.meshCache = this.constructMeshCache();
         this.transformNodeCache = this.constructTransformNodeCache();
@@ -209,7 +120,7 @@ export class VRMManager {
      * @param label モーフ名
      * @param value 値
      */
-    private calcMorphValue(label: string, value: number): number {
+    protected calcMorphValue(label: string, value: number): number {
         const v = Math.max(0.0, Math.min(1.0, value));
         if (this.isBinaryMorphMap[label]) {
             return v > 0.5 ? 1.0 : 0.0;
@@ -305,7 +216,7 @@ export class VRMManager {
     /**
      * 事前に MorphTarget と isBinary を紐付ける
      */
-    private constructIsBinaryMap(): void {
+    protected constructIsBinaryMap(): void {
         this.ext.blendShapeMaster.blendShapeGroups.forEach((g) => {
             this.isBinaryMorphMap[g.name] = g.isBinary;
         });
@@ -314,7 +225,7 @@ export class VRMManager {
     /**
      * 事前に MorphTarget と BlendShape を紐付ける
      */
-    private constructMorphTargetMap(): void {
+    protected constructMorphTargetMap(): void {
         this.ext.blendShapeMaster.blendShapeGroups.forEach((g) => {
             if (!g.binds) {
                 return;
@@ -352,7 +263,7 @@ export class VRMManager {
     /**
      * 事前に MaterialValueBindingMerger とモーフ名を紐付ける
      */
-    private constructMaterialValueBindingMergerMap() {
+    protected constructMaterialValueBindingMergerMap() {
         const materials = this.scene.materials.slice(this.materialsNodesFrom);
         this.ext.blendShapeMaster.blendShapeGroups.forEach((g) => {
             if (!g.materialValues) {
@@ -365,7 +276,7 @@ export class VRMManager {
     /**
      * 事前に TransformNode と bone 名を紐づける
      */
-    private constructTransformNodeMap() {
+    protected constructTransformNodeMap() {
         this.ext.humanoid.humanBones.forEach((b) => {
             const node = this.findTransformNode(b.node);
             if (!node) {
@@ -378,7 +289,7 @@ export class VRMManager {
     /**
      * node 番号と TransformNode を紐づける
      */
-    private constructTransformNodeCache() {
+    protected constructTransformNodeCache() {
         const cache: TransformNodeCache = {};
         for (let index = this.transformNodesFrom; index < this.scene.transformNodes.length; index++) {
             const node = this.scene.transformNodes[index];
@@ -403,7 +314,7 @@ export class VRMManager {
     /**
      * mesh 番号と Mesh を紐づける
      */
-    private constructMeshCache() {
+    protected constructMeshCache() {
         const cache: MeshCache = {};
         for (let index = this.meshesFrom; index < this.scene.meshes.length; index++) {
             const mesh = this.scene.meshes[index];

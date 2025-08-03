@@ -4,6 +4,7 @@ import type { Nullable } from '@babylonjs/core/types';
 import type { IGLTFLoaderExtension, IMaterial, IMeshPrimitive } from '@babylonjs/loaders/glTF/2.0';
 import { GLTFLoader } from '@babylonjs/loaders/glTF/2.0';
 import { VRMManager } from './vrm-manager';
+import { VRMManager10 } from './vrm-manager10';
 import { VRMMaterialGenerator } from './vrm-material-generator';
 
 /**
@@ -59,11 +60,20 @@ export class VRM implements IGLTFLoaderExtension {
      * @inheritdoc
      */
     public onReady() {
-        if (!this.loader.gltf.extensions || !this.loader.gltf.extensions[NAME]) {
+        if (!this.loader.gltf.extensions || (!this.loader.gltf.extensions[NAME] && !this.loader.gltf.extensions["VRMC_vrm"])) {
             return;
         }
         const scene = this.loader.babylonScene;
-        const manager = new VRMManager(this.loader.gltf.extensions[NAME], this.loader.babylonScene, this.meshesFrom, this.transformNodesFrom, this.materialsFrom);
+        // const vrmExtension = this.loader.gltf.extensions[NAME] || this.loader.gltf.extensions["VRMC_vrm"]
+        // const manager = new VRMManager(vrmExtension, this.loader.babylonScene, this.meshesFrom, this.transformNodesFrom, this.materialsFrom);
+        let manager : VRMManager;
+        if (this.loader.gltf.extensions[NAME]) {
+            // 0.x
+            manager = new VRMManager(this.loader.gltf.extensions[NAME], this.loader.babylonScene, this.meshesFrom, this.transformNodesFrom, this.materialsFrom);
+        } else {
+            // 1.0
+            manager = new VRMManager10(this.loader.gltf.extensions["VRMC_vrm"], this.loader.babylonScene, this.meshesFrom, this.transformNodesFrom, this.materialsFrom);
+        }
         scene.metadata = scene.metadata || {};
         scene.metadata.vrmManagers = scene.metadata.vrmManagers || [];
         scene.metadata.vrmManagers.push(manager);

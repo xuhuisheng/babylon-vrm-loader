@@ -50,7 +50,7 @@ export class SpringBoneController {
     }
 
     private constructColliderGroups(getBone: getBone) {
-        if (!this.ext.colliderGroups || !this.ext.colliderGroups.length) {
+        if (!this.ext || !this.ext.colliderGroups || !this.ext.colliderGroups.length) {
             return [];
         }
         const colliderGroups: ColliderGroup[] = [];
@@ -70,7 +70,7 @@ export class SpringBoneController {
     }
 
     private constructSprings(getBone: getBone, colliderGroups: ColliderGroup[]) {
-        if (!this.ext.boneGroups || !this.ext.boneGroups.length) {
+        if (!this.ext || !this.ext.boneGroups || !this.ext.boneGroups.length) {
             return [];
         }
         const springs: VRMSpringBone[] = [];
