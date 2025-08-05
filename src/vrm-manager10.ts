@@ -58,7 +58,6 @@ export class VRMManager10 extends VRMManager {
 
         this._humanoidBone = new HumanoidBone(this.transformNodeMap);
 
-        console.log(this.transformNodeMap)
         this.springBoneController10 = new SpringBoneController10(this.extSpringBone, this.findTransformNode.bind(this), this.getBone.bind(this));
     }
 

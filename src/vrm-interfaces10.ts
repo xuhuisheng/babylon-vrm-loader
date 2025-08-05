@@ -135,15 +135,17 @@ export interface IVRMBlendShapeMaterialBind {
 }
 
 export interface IVRMSecondaryAnimationSpring {
-    comment: string;
-    stiffiness: number;
-    gravityPower: number;
-    gravityDir: IVRMVector3;
-    dragForce: number;
-    center: number;
-    hitRadius: number;
-    bones: number[];
+    name: string;
     colliderGroups: number[];
+    joints: IVRMSecondaryAnimationSpringJoint[];
+}
+
+export interface IVRMSecondaryAnimationSpringJoint {
+    dragForce: number;
+    gravityPower: number;
+    hitRadius: number;
+    node: number;
+    stiffiness: number;
 }
 
 export interface IVRMSecondaryAnimationCollider {
@@ -170,12 +172,13 @@ export interface IVRMSecondaryAnimationColliderGroup {
 }
 
 /**
- * extensions.VRMC_vrm.secondaryAnimation
+ * extensions.VRMC_springBone
  */
 export interface IVRMSecondaryAnimation {
-    // boneGroups: IVRMSecondaryAnimationSpring[];
+    specVersion: string;
     colliderGroups: IVRMSecondaryAnimationColliderGroup[];
     colliders: IVRMSecondaryAnimationCollider[];
+    springs: IVRMSecondaryAnimationSpring[];
 }
 
 export enum IVRMMaterialPropertyShader {
