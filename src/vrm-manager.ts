@@ -46,7 +46,9 @@ export class VRMManager {
     ) {
         this.meshCache = this.constructMeshCache();
         this.transformNodeCache = this.constructTransformNodeCache();
-        this.springBoneController = new SpringBoneController(this.ext.secondaryAnimation, this.findTransformNode.bind(this));
+        if (this.ext.secondaryAnimation) {
+            this.springBoneController = new SpringBoneController(this.ext.secondaryAnimation, this.findTransformNode.bind(this));
+        }
 
         if (this.ext.blendShapeMaster && this.ext.blendShapeMaster.blendShapeGroups) {
             this.constructIsBinaryMap();
@@ -64,7 +66,9 @@ export class VRMManager {
      * @param deltaTime 前フレームからの経過秒数(sec)
      */
     public async update(deltaTime: number): Promise<void> {
-        await this.springBoneController.update(deltaTime);
+        if (this.springBoneController) {
+            await this.springBoneController.update(deltaTime);
+        }
     }
 
     /**

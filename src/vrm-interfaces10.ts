@@ -149,19 +149,33 @@ export interface IVRMSecondaryAnimationSpring {
 export interface IVRMSecondaryAnimationCollider {
     offset: IVRMVector3;
     radius: number;
+    node: number;
+    shape: IVRMSecondaryAnimationColliderShape;
+}
+
+export interface IVRMSecondaryAnimationColliderShape {
+    sphere: IVRMSecondaryAnimationColliderShapeSphere;
+    capsule: IVRMSecondaryAnimationColliderShapeSphere
+}
+
+export interface IVRMSecondaryAnimationColliderShapeSphere {
+    offset: IVRMVector3;
+    radius: number;
+    tail: IVRMVector3;
 }
 
 export interface IVRMSecondaryAnimationColliderGroup {
-    node: number;
-    colliders: IVRMSecondaryAnimationCollider[];
+    name: string;
+    colliders: number[];
 }
 
 /**
  * extensions.VRMC_vrm.secondaryAnimation
  */
 export interface IVRMSecondaryAnimation {
-    boneGroups: IVRMSecondaryAnimationSpring[];
+    // boneGroups: IVRMSecondaryAnimationSpring[];
     colliderGroups: IVRMSecondaryAnimationColliderGroup[];
+    colliders: IVRMSecondaryAnimationCollider[];
 }
 
 export enum IVRMMaterialPropertyShader {

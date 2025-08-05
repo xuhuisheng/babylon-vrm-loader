@@ -4,10 +4,10 @@
 // import type { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
 import type { Scene } from '@babylonjs/core/scene';
 // import type { Nullable } from '@babylonjs/core/types';
-// import { SpringBoneController } from './secondary-animation/spring-bone-controller';
+import { SpringBoneController10 } from './secondary-animation/spring-bone-controller10';
 import { HumanoidBone } from './humanoid-bone';
 import { IVRM } from './vrm-interfaces';
-import type { IVRM10 } from './vrm-interfaces10';
+import type { IVRM10, IVRMSecondaryAnimation } from './vrm-interfaces10';
 // import { MaterialValueBindingMerger } from './material-value-binding-merger';
 import { VRMManager } from './vrm-manager'
 // import { IsBinaryMap, MorphTargetMap, MaterialValueBindingMergerMap, TransformNodeMap, TransformNodeCache, MeshCache, HumanBoneName } from './vrm-interfaces-defines';
@@ -29,7 +29,7 @@ export class VRMManager10 extends VRMManager {
     // /**
     //  * Secondary Animation として定義されている VRM Spring Bone のコントローラ
     //  */
-    // public readonly springBoneController: SpringBoneController;
+    public readonly springBoneController10: SpringBoneController10;
 
     /**
      *
@@ -41,15 +41,13 @@ export class VRMManager10 extends VRMManager {
      */
     public constructor(
         public readonly ext10: IVRM10,
+        public readonly extSpringBone: IVRMSecondaryAnimation,
         public readonly scene: Scene,
         protected readonly meshesFrom: number,
         protected readonly transformNodesFrom: number,
         protected readonly materialsNodesFrom: number
     ) {
         super(<IVRM>({} as unknown), scene, meshesFrom, transformNodesFrom, materialsNodesFrom)
-        // this.meshCache = this.constructMeshCache();
-        // this.transformNodeCache = this.constructTransformNodeCache();
-        // this.springBoneController = new SpringBoneController(this.ext.secondaryAnimation, this.findTransformNode.bind(this));
 
         if (this.ext10.expressions && this.ext10.expressions.preset) {
             this.constructIsBinaryMap();
@@ -59,6 +57,15 @@ export class VRMManager10 extends VRMManager {
         this.constructTransformNodeMap();
 
         this._humanoidBone = new HumanoidBone(this.transformNodeMap);
+
+        console.log(this.transformNodeMap)
+        this.springBoneController10 = new SpringBoneController10(this.extSpringBone, this.findTransformNode.bind(this), this.getBone.bind(this));
+    }
+
+    public async update(deltaTime: number): Promise<void> {
+        if (this.springBoneController10) {
+            await this.springBoneController10.update(deltaTime);
+        }
     }
 
     protected constructIsBinaryMap(): void {
