@@ -59,7 +59,7 @@ export class SpringBoneController10 {
         this.ext.colliderGroups.forEach((colliderGroup) => {
             let name = colliderGroup.name
             name = name.substring(0, 1).toLowerCase() + name.substring(1)
-            const bone = getBoneByName(name) as TransformNode;
+            // const bone = getBoneByName(name) as TransformNode;
             const g = new ColliderGroup10();
             colliderGroup.colliders.forEach((colliderIndex) => {
                 let colliderElement = this.ext.colliders[colliderIndex]
@@ -71,10 +71,11 @@ export class SpringBoneController10 {
                 if (!collider) {
                     return
                 }
-                // const bone = getBone(colliderElement.node) as TransformNode;
+                const bone = getBone(colliderElement.node) as TransformNode;
                 g.addCollider(
                     // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
-                    new Vector3(-collider.offset.x, collider.offset.y, -collider.offset.z),
+                    // new Vector3(-collider.offset.x, collider.offset.y, -collider.offset.z),
+                    new Vector3(-collider.offset[0], collider.offset[1], -collider.offset[2]),
                     collider.radius,
                     bone
                 );
@@ -89,14 +90,13 @@ export class SpringBoneController10 {
             return [];
         }
         const springs: VRMSpringBone10[] = [];
-        this.ext.springs.forEach((spring, index) => {
+        this.ext.springs.forEach((spring) => {
             const rootBones = (spring.joints || []).map((joint) => {
                 return getBone(joint.node) as TransformNode;
             });
             const springColliders = (spring.colliderGroups || []).map<ColliderGroup10>((g) => {
                 return colliderGroups[g];
             });
-            // const springColliders = [colliderGroups[index]];
             springs.push(
                 // new VRMSpringBone10(
                 //     spring.comment,

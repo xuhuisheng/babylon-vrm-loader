@@ -161,7 +161,7 @@ export interface IVRMSecondaryAnimationColliderShape {
 }
 
 export interface IVRMSecondaryAnimationColliderShapeSphere {
-    offset: IVRMVector3;
+    offset: number[];
     radius: number;
     tail: IVRMVector3;
 }
