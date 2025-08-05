@@ -78,26 +78,19 @@ export class VRMManager10 extends VRMManager {
         if (!this.ext10) {
             return
         }
-        for (let key of Object.keys(this.ext10.expressions.preset)) {
+
+        Object.keys(this.ext10.expressions.preset).forEach((key) => {
             let g = this.ext10.expressions.preset[key]
             if (!g) {
-                return
+                return;
             }
+
             if (!g.morphTargetBinds) {
                 return;
             }
+
             let name = key
             let presetName = key
-            // if (key == 'happy') {
-            //     name = 'Joy'
-            //     presetName = 'joy'
-            // } else if (key == 'blink') {
-            //     name = 'Blink'
-            //     presetName = 'blink'
-            // } else if (key == 'aa') {
-            //     name = 'A'
-            //     presetName = 'a'
-            // }
             g.morphTargetBinds.forEach((b) => {
                 const meshes = this.findMeshes(b.node);
                 if (!meshes) {
@@ -125,7 +118,9 @@ export class VRMManager10 extends VRMManager {
                     }
                 });
             });
-        }
+
+        });
+
     }
 
     protected constructMaterialValueBindingMergerMap() {
