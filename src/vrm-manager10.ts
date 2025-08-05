@@ -88,16 +88,16 @@ export class VRMManager10 extends VRMManager {
             }
             let name = key
             let presetName = key
-            if (key == 'happy') {
-                name = 'Joy'
-                presetName = 'joy'
-            } else if (key == 'blink') {
-                name = 'Blink'
-                presetName = 'blink'
-            } else if (key == 'aa') {
-                name = 'A'
-                presetName = 'a'
-            }
+            // if (key == 'happy') {
+            //     name = 'Joy'
+            //     presetName = 'joy'
+            // } else if (key == 'blink') {
+            //     name = 'Blink'
+            //     presetName = 'blink'
+            // } else if (key == 'aa') {
+            //     name = 'A'
+            //     presetName = 'a'
+            // }
             g.morphTargetBinds.forEach((b) => {
                 const meshes = this.findMeshes(b.node);
                 if (!meshes) {
@@ -157,5 +157,15 @@ export class VRMManager10 extends VRMManager {
             }
             this.transformNodeMap[key] = node;
         }
+    }
+
+    public morphingPreset(label: string, value: number): void {
+        if (!this.presetMorphTargetMap[label]) {
+            return;
+        }
+        const v = this.calcMorphValue(label, value);
+        this.presetMorphTargetMap[label].forEach((setting) => {
+            setting.target.influence = v * (setting.weight / 1);
+        });
     }
 }
