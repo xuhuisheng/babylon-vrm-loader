@@ -88,6 +88,14 @@ export class VRMSpringBone10 {
                     mat.wireframe = true;
                     sphere.material = mat;
                 }
+                const sphereTail = collider.sphereTail;
+                if (sphereTail && !sphereTail.isEnabled(false)) {
+                    sphereTail.setEnabled(true);
+                    const mat = new StandardMaterial(collider.transform.name + '_colliderTailGizmomat', scene);
+                    mat.emissiveColor = Color3.Yellow();
+                    mat.wireframe = true;
+                    sphereTail.material = mat;
+                }
             });
         });
     }

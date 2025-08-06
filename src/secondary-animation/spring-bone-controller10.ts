@@ -64,18 +64,30 @@ export class SpringBoneController10 {
             colliderGroup.colliders.forEach((colliderIndex) => {
                 let colliderElement = this.ext.colliders[colliderIndex]
                 // console.log(colliderElement)
+
+                const bone = getBone(colliderElement.node) as TransformNode;
+                let offset = null;
+                let tail = null;
                 let collider = colliderElement.shape.sphere
                 if (!collider) {
                     collider = colliderElement.shape.capsule
+                    if (!collider) {
+                        return
+                    } else {
+                        offset = new Vector3(-collider.offset[0], collider.offset[1], -collider.offset[2])
+                        tail = new Vector3(-collider.tail[0], collider.tail[1], -collider.tail[2])
+                    }
+                } else {
+                    offset = new Vector3(-collider.offset[0], collider.offset[1], -collider.offset[2])
                 }
-                if (!collider) {
-                    return
-                }
-                const bone = getBone(colliderElement.node) as TransformNode;
+                // if (collider.offset[1] < 0) {
+                //     offset = new Vector3(-collider.offset[1], collider.offset[0], collider.offset[2])
+                // }
                 g.addCollider(
                     // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
                     // new Vector3(-collider.offset.x, collider.offset.y, -collider.offset.z),
-                    new Vector3(-collider.offset[0], collider.offset[1], -collider.offset[2]),
+                    offset,
+                    tail,
                     collider.radius,
                     bone
                 );

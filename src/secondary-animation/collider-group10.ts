@@ -20,7 +20,7 @@ export class ColliderGroup10 {
      * @param offset The local coordinate from the node of the collider group.
      * @param radius The radius of the collider.
      */
-    public addCollider(offset: Vector3, radius: number, transform: TransformNode) {
+    public addCollider(offset: Vector3, tail: Vector3 | null, radius: number, transform: TransformNode) {
         const sphere = SphereBuilder.CreateSphere(
             `${transform.name}_ColliderSphere`,
             {
@@ -34,6 +34,22 @@ export class ColliderGroup10 {
         sphere.setPositionWithLocalVector(offset);
         sphere.setEnabled(false);
 
-        this.colliders.push(new Collider10(offset, radius, sphere, transform));
+        let sphereTail = null
+        if (tail) {
+            sphereTail = SphereBuilder.CreateSphere(
+                `${transform.name}_ColliderSphereTail`,
+                {
+                    segments: 6,
+                    diameter: radius * 2.0,
+                    updatable: true,
+                },
+                transform.getScene()
+            );
+            sphere.setParent(transform);
+            sphere.setPositionWithLocalVector(tail);
+            sphere.setEnabled(false);
+        }
+
+        this.colliders.push(new Collider10(offset, tail, radius, sphere, sphereTail, transform));
     }
 }
