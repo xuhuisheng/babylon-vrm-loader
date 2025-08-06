@@ -45,9 +45,9 @@ export class ColliderGroup10 {
                 },
                 transform.getScene()
             );
-            sphere.setParent(transform);
-            sphere.setPositionWithLocalVector(tail);
-            sphere.setEnabled(false);
+            sphereTail.setParent(transform);
+            sphereTail.setPositionWithLocalVector(tail);
+            sphereTail.setEnabled(false);
         }
 
         this.colliders.push(new Collider10(offset, tail, radius, sphere, sphereTail, transform));

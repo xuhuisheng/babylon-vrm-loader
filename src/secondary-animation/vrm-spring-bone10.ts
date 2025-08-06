@@ -92,7 +92,7 @@ export class VRMSpringBone10 {
                 if (sphereTail && !sphereTail.isEnabled(false)) {
                     sphereTail.setEnabled(true);
                     const mat = new StandardMaterial(collider.transform.name + '_colliderTailGizmomat', scene);
-                    mat.emissiveColor = Color3.Yellow();
+                    mat.emissiveColor = Color3.Green();
                     mat.wireframe = true;
                     sphereTail.material = mat;
                 }
