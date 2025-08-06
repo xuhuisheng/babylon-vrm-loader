@@ -57,8 +57,8 @@ export class SpringBoneController10 {
         }
         const colliderGroups: ColliderGroup10[] = [];
         this.ext.colliderGroups.forEach((colliderGroup) => {
-            let name = colliderGroup.name
-            name = name.substring(0, 1).toLowerCase() + name.substring(1)
+            // let name = colliderGroup.name
+            // name = name.substring(0, 1).toLowerCase() + name.substring(1)
             // const bone = getBoneByName(name) as TransformNode;
             const g = new ColliderGroup10();
             colliderGroup.colliders.forEach((colliderIndex) => {
