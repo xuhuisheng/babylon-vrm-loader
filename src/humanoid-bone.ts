@@ -161,6 +161,9 @@ export class HumanoidBone {
     public get jaw() {
         return this.getOptionalBone('jaw');
     }
+    public get leftThumbMetacarpal() {
+        return this.getOptionalBone('leftThumbMetacarpal');
+    }
     /**
      * 左親指第一指骨(Optional)
      */
@@ -250,6 +253,9 @@ export class HumanoidBone {
      */
     public get leftLittleDistal() {
         return this.getOptionalBone('leftLittleDistal');
+    }
+    public get rightThumbMetacarpal() {
+        return this.getOptionalBone('rightThumbMetacarpal');
     }
     /**
      * 右親指第一指骨(Optional)
