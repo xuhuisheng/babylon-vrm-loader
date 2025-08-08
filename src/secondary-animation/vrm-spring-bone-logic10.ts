@@ -1,6 +1,7 @@
 import { Matrix, Quaternion, Vector3 } from '@babylonjs/core/Maths/math';
 import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import type { Nullable } from '@babylonjs/core/types';
+import type { Collider10 } from './collider10';
 import type { ColliderGroup10 } from './collider-group10';
 import { VRMSpringBoneJoint10 } from './vrm-spring-bone-joint10';
 // based on
@@ -249,28 +250,86 @@ export class VRMSpringBoneLogic10 {
     private collide(colliderGroups: ColliderGroup10[], tail: Vector3) {
         colliderGroups.forEach((colliderGroup) => {
             colliderGroup.colliders.forEach((collider) => {
-                this.getMatrixWorldToCenter(_matA);
-                collider.sphere.computeWorldMatrix().multiplyToRef(_matA, _matA);
-                _matA.getTranslationToRef(_v3A);
-                const colliderCenterSpacePosition = _v3A;
-
-                let maxAbsScale = 0;
-                collider.sphere.absoluteScaling.asArray().forEach((s) => {
-                    maxAbsScale = Math.max(maxAbsScale, Math.abs(s));
-                });
-                const colliderRadius = collider.radius * maxAbsScale;
-                const r = (this.radius ? this.radius : 0.1) + colliderRadius;
-
-                tail.subtractToRef(colliderCenterSpacePosition, _v3B);
-                if (_v3B.lengthSquared() <= r * r) {
-                    const normal = _v3B.copyFrom(tail).subtractInPlace(colliderCenterSpacePosition).normalize();
-                    const posFromCollider = _v3C.copyFrom(colliderCenterSpacePosition).addInPlace(normal.scaleInPlace(r));
-
-                    tail.copyFrom(
-                        posFromCollider.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(this.centerSpaceBoneLength).addInPlace(this.centerSpacePosition)
-                    );
+                if (collider.sphere && this.collideSphere(collider, tail)) {
+                    //
+                } else if (collider.sphereTail && this.collideCapsule(collider, tail)) {
+                    //
                 }
             });
         });
+    }
+
+    private collideSphere(collider: Collider10, tail: Vector3) {
+        this.getMatrixWorldToCenter(_matA);
+        collider.sphere.computeWorldMatrix().multiplyToRef(_matA, _matA);
+        _matA.getTranslationToRef(_v3A);
+        const colliderCenterSpacePosition = _v3A;
+
+        let maxAbsScale = 0;
+        collider.sphere.absoluteScaling.asArray().forEach((s) => {
+            maxAbsScale = Math.max(maxAbsScale, Math.abs(s));
+        });
+        const colliderRadius = collider.radius * maxAbsScale;
+        const r = (this.radius ? this.radius : 0.1) + colliderRadius;
+
+        tail.subtractToRef(colliderCenterSpacePosition, _v3B);
+        if (_v3B.lengthSquared() <= r * r) {
+            const normal = _v3B.copyFrom(tail).subtractInPlace(colliderCenterSpacePosition).normalize();
+            const posFromCollider = _v3C.copyFrom(colliderCenterSpacePosition).addInPlace(normal.scaleInPlace(r));
+
+            tail.copyFrom(
+                posFromCollider.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(this.centerSpaceBoneLength).addInPlace(this.centerSpacePosition)
+            );
+        }
+        return _v3B.lengthSquared() <= r * r
+    }
+
+    private collideCapsule(collider: Collider10, tail: Vector3) {
+
+        this.getMatrixWorldToCenter(_matA);
+        collider.sphere.computeWorldMatrix().multiplyToRef(_matA, _matA);
+        _matA.getTranslationToRef(_v3A);
+        const colliderCenterSpacePosition = _v3A;
+
+        let maxAbsScale = 0;
+        collider.sphere.absoluteScaling.asArray().forEach((s) => {
+            maxAbsScale = Math.max(maxAbsScale, Math.abs(s));
+        });
+        const colliderRadius = collider.radius * maxAbsScale;
+        const r = (this.radius ? this.radius : 0.1) + colliderRadius;
+
+        tail.subtractToRef(colliderCenterSpacePosition, _v3B);
+        if (_v3B.lengthSquared() <= r * r) {
+            const normal = _v3B.copyFrom(tail).subtractInPlace(colliderCenterSpacePosition).normalize();
+            const posFromCollider = _v3C.copyFrom(colliderCenterSpacePosition).addInPlace(normal.scaleInPlace(r));
+
+            tail.copyFrom(
+                posFromCollider.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(this.centerSpaceBoneLength).addInPlace(this.centerSpacePosition)
+            );
+        } else if (collider.sphereTail) {
+
+            this.getMatrixWorldToCenter(_matA);
+            collider.sphere.computeWorldMatrix().multiplyToRef(_matA, _matA);
+            _matA.getTranslationToRef(_v3A);
+            const colliderCenterSpacePosition = _v3A;
+
+            let maxAbsScale = 0;
+            collider.sphereTail.absoluteScaling.asArray().forEach((s) => {
+                maxAbsScale = Math.max(maxAbsScale, Math.abs(s));
+            });
+            const colliderRadius = collider.radius * maxAbsScale;
+            const r = (this.radius ? this.radius : 0.1) + colliderRadius;
+
+            tail.subtractToRef(colliderCenterSpacePosition, _v3B);
+            if (_v3B.lengthSquared() <= r * r) {
+                const normal = _v3B.copyFrom(tail).subtractInPlace(colliderCenterSpacePosition).normalize();
+                const posFromCollider = _v3C.copyFrom(colliderCenterSpacePosition).addInPlace(normal.scaleInPlace(r));
+
+                tail.copyFrom(
+                    posFromCollider.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(this.centerSpaceBoneLength).addInPlace(this.centerSpacePosition)
+                ); 
+            }
+        }
+        return _v3B.lengthSquared() <= r * r
     }
 }
