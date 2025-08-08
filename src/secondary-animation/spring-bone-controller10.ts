@@ -1,9 +1,11 @@
 import { Vector3 } from '@babylonjs/core/Maths/math';
 import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import type { Nullable } from '@babylonjs/core/types';
-import type { IVRMSecondaryAnimation } from '../vrm-interfaces10';
+import type { IVRMSecondaryAnimation, IVRMSecondaryAnimationSpringJoint } from '../vrm-interfaces10';
 import { ColliderGroup10 } from './collider-group10';
 import { VRMSpringBone10 } from './vrm-spring-bone10';
+import { VRMSpringBoneJoint10 } from './vrm-spring-bone-joint10'
+import { VRMSpringBoneJointSetting10 } from './vrm-spring-bone-joint-setting10'
 
 /**
  * function to get bone from nodeIndex
@@ -103,12 +105,63 @@ export class SpringBoneController10 {
         }
         const springs: VRMSpringBone10[] = [];
         this.ext.springs.forEach((spring) => {
-            const rootBones = (spring.joints || []).map((joint) => {
-                return getBone(joint.node) as TransformNode;
-            });
+            // const rootBones = (spring.joints || []).map((joint) => {
+            //     return getBone(joint.node) as TransformNode;
+            // });
             const springColliders = (spring.colliderGroups || []).map<ColliderGroup10>((g) => {
                 return colliderGroups[g];
             });
+
+            let schemaSpring = spring
+            let schemeJoints = spring.joints
+            let colliderGroupsForSpring = springColliders
+            const center = schemaSpring.center != null ? getBone(schemaSpring.center) : undefined;
+
+            let joints : VRMSpringBoneJoint10[] = []
+
+            let prevSchemaJoint: IVRMSecondaryAnimationSpringJoint | undefined;
+            schemeJoints.forEach((schemaJoint) => {
+                if (prevSchemaJoint) {
+                    // prepare node
+                    const nodeIndex = prevSchemaJoint.node;
+                    const node = getBone(nodeIndex);
+                    const childIndex = schemaJoint.node;
+                    const child = getBone(childIndex);
+
+                    // prepare setting
+                    // const setting: VRMSpringBoneJointSetting10 = {
+                    //     hitRadius: prevSchemaJoint.hitRadius,
+                    //     dragForce: prevSchemaJoint.dragForce,
+                    //     gravityPower: prevSchemaJoint.gravityPower,
+                    //     stiffness: prevSchemaJoint.stiffness,
+                    //     gravityDir:
+                    //       prevSchemaJoint.gravityDir != null
+                    //         ? new BABYLON.Vector3().fromArray(prevSchemaJoint.gravityDir)
+                    //         : undefined,
+                    // };
+                    const setting: VRMSpringBoneJointSetting10 = new VRMSpringBoneJointSetting10(
+                        prevSchemaJoint.hitRadius,
+                        prevSchemaJoint.dragForce,
+                        prevSchemaJoint.gravityPower,
+                        prevSchemaJoint.stiffness,
+                          prevSchemaJoint.gravityDir != null
+                            ? Vector3.FromArray(prevSchemaJoint.gravityDir)
+                            : undefined,
+                    );
+
+                    // create spring bones
+                    const joint = this._importJoint(node, child, setting, colliderGroupsForSpring);
+                    if (center) {
+                        joint.center = center;
+                    }
+
+                    // manager.addJoint(joint);
+                    joints.push(joint)
+                }
+
+                prevSchemaJoint = schemaJoint;
+            });
+
             springs.push(
                 // new VRMSpringBone10(
                 //     spring.comment,
@@ -126,24 +179,37 @@ export class SpringBoneController10 {
                 //     rootBones,
                 //     springColliders
                 // )
+
+                // new VRMSpringBone10(
+                //     spring.name,
+                //     2,
+                //     0,
+                //     new Vector3(
+                //         // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
+                //         -0,
+                //         -1,
+                //         0
+                //     ).normalize(),
+                //     0.7,
+                //     getBone(-1),
+                //     spring.joints[0].hitRadius,
+                //     rootBones,
+                //     springColliders
+                // )
+
                 new VRMSpringBone10(
-                    "",
-                    2,
-                    0,
-                    new Vector3(
-                        // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
-                        -0,
-                        -1,
-                        0
-                    ).normalize(),
-                    0.7,
-                    getBone(-1),
-                    0.02,
-                    rootBones,
+                    spring.name,
+                    center,
+                    joints,
                     springColliders
                 )
             );
         });
         return springs;
+    }
+
+    private _importJoint(node: TransformNode | null, child: TransformNode | null, setting: VRMSpringBoneJointSetting10, colliderGroupsForSpring: ColliderGroup10[]): VRMSpringBoneJoint10 {
+        let joint = new VRMSpringBoneJoint10(node, child, setting, colliderGroupsForSpring)
+        return joint;
     }
 }

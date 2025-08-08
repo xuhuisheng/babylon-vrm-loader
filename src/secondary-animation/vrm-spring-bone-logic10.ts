@@ -2,6 +2,7 @@ import { Matrix, Quaternion, Vector3 } from '@babylonjs/core/Maths/math';
 import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import type { Nullable } from '@babylonjs/core/types';
 import type { ColliderGroup10 } from './collider-group10';
+import { VRMSpringBoneJoint10 } from './vrm-spring-bone-joint10';
 // based on
 // http://rocketjump.skr.jp/unity3d/109/
 // https://github.com/dwango/UniVRM/blob/master/Scripts/SpringBone/VRMSpringBone.cs
@@ -55,7 +56,49 @@ export class VRMSpringBoneLogic10 {
      * @param radius Collision Radius
      * @param transform Base TransformNode
      */
-    public constructor(public readonly center: Nullable<TransformNode>, public readonly radius: number, public readonly transform: TransformNode) {
+    // public constructor(public readonly center: Nullable<TransformNode>, public readonly radius: number, public readonly transform: TransformNode) {
+    //     // Initialize rotationQuaternion when not initialized
+    //     if (!transform.rotationQuaternion) {
+    //         transform.rotationQuaternion = transform.rotation.toQuaternion();
+    //     }
+
+    //     const worldMatrix = transform.getWorldMatrix();
+    //     this.centerSpacePosition = worldMatrix.getTranslation();
+
+    //     this.initialLocalMatrix = transform._localMatrix.clone();
+    //     this.initialLocalRotation = transform.rotationQuaternion.clone();
+
+    //     const children = transform.getChildTransformNodes(true);
+    //     if (children.length === 0) {
+    //         this.initialLocalChildPosition = transform.position.clone().normalize().scaleInPlace(0.07);
+    //     } else {
+    //         this.initialLocalChildPosition = children[0].position.clone();
+    //     }
+
+    //     Vector3.TransformCoordinatesToRef(this.initialLocalChildPosition, worldMatrix, this.currentTail);
+    //     this.prevTail.copyFrom(this.currentTail);
+    //     this.nextTail.copyFrom(this.currentTail);
+
+    //     this.boneAxis = this.initialLocalChildPosition.normalizeToNew();
+    //     Vector3.TransformCoordinatesToRef(this.initialLocalChildPosition, worldMatrix, _v3A);
+    //     this.centerSpaceBoneLength = _v3A.subtractInPlace(this.centerSpacePosition).length();
+
+    //     if (center) {
+    //         this.getMatrixWorldToCenter(_matA);
+
+    //         Vector3.TransformCoordinatesToRef(this.currentTail, _matA, this.currentTail);
+    //         Vector3.TransformCoordinatesToRef(this.prevTail, _matA, this.prevTail);
+    //         Vector3.TransformCoordinatesToRef(this.nextTail, _matA, this.nextTail);
+
+    //         worldMatrix.multiplyToRef(_matA, _matA);
+
+    //         _matA.getTranslationToRef(this.centerSpacePosition);
+
+    //         Vector3.TransformCoordinatesToRef(this.initialLocalChildPosition, _matA, _v3A);
+    //         this.centerSpaceBoneLength = _v3A.subtractInPlace(this.centerSpacePosition).length();
+    //     }
+    // }
+    public constructor(public readonly center: Nullable<TransformNode> | undefined, public readonly radius: number | null, public readonly transform: TransformNode, public joint : Nullable<VRMSpringBoneJoint10>) {
         // Initialize rotationQuaternion when not initialized
         if (!transform.rotationQuaternion) {
             transform.rotationQuaternion = transform.rotation.toQuaternion();
@@ -106,7 +149,19 @@ export class VRMSpringBoneLogic10 {
      * @param external Current frame external force
      * @param colliderGroups Current frame colliderGroups
      */
-    public update(stiffnessForce: number, dragForce: number, external: Vector3, colliderGroups: ColliderGroup10[]): void {
+    // public update(stiffnessForce: number, dragForce: number, external: Vector3, colliderGroups: ColliderGroup10[]): void {
+    public update(colliderGroups: ColliderGroup10[], deltaTime: number): void {
+        if (!this.joint || !this.joint.setting || !this.joint.setting.stiffness || !this.joint.setting.gravityDir || !this.joint.setting.gravityPower || !this.joint.setting.dragForce) {
+            return;
+        }
+
+        const stiffness = this.joint.setting.stiffness * deltaTime;
+        const external = this.joint.setting.gravityDir.scale(this.joint.setting.gravityPower * deltaTime);
+
+        const stiffnessForce = stiffness;
+        const dragForce = this.joint.setting.dragForce
+
+
         if (Number.isNaN(this.transform.getAbsolutePosition().x)) {
             // Do not update when absolute position is invalid
             return;
@@ -204,7 +259,7 @@ export class VRMSpringBoneLogic10 {
                     maxAbsScale = Math.max(maxAbsScale, Math.abs(s));
                 });
                 const colliderRadius = collider.radius * maxAbsScale;
-                const r = this.radius + colliderRadius;
+                const r = (this.radius ? this.radius : 0.1) + colliderRadius;
 
                 tail.subtractToRef(colliderCenterSpacePosition, _v3B);
                 if (_v3B.lengthSquared() <= r * r) {

@@ -136,6 +136,7 @@ export interface IVRMBlendShapeMaterialBind {
 
 export interface IVRMSecondaryAnimationSpring {
     name: string;
+    center: number;
     colliderGroups: number[];
     joints: IVRMSecondaryAnimationSpringJoint[];
 }
@@ -145,7 +146,8 @@ export interface IVRMSecondaryAnimationSpringJoint {
     gravityPower: number;
     hitRadius: number;
     node: number;
-    stiffiness: number;
+    stiffness: number;
+    gravityDir: number[];
 }
 
 export interface IVRMSecondaryAnimationCollider {
