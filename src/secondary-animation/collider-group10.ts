@@ -31,7 +31,8 @@ export class ColliderGroup10 {
             transform.getScene()
         );
         sphere.setParent(transform);
-        sphere.setPositionWithLocalVector(offset);
+        // sphere.setPositionWithLocalVector(offset);
+        sphere.position = offset;
         sphere.setEnabled(false);
 
         let sphereTail = null
@@ -46,7 +47,8 @@ export class ColliderGroup10 {
                 transform.getScene()
             );
             sphereTail.setParent(transform);
-            sphereTail.setPositionWithLocalVector(tail);
+            // sphereTail.setPositionWithLocalVector(tail);
+            sphereTail.position = tail;
             sphereTail.setEnabled(false);
         }
 

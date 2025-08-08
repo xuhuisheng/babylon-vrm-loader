@@ -74,11 +74,11 @@ export class SpringBoneController10 {
                     if (!collider) {
                         return
                     } else {
-                        offset = new Vector3(-collider.offset[0], collider.offset[1], -collider.offset[2])
-                        tail = new Vector3(-collider.tail[0], collider.tail[1], -collider.tail[2])
+                        offset = new Vector3(collider.offset[0], collider.offset[1], collider.offset[2])
+                        tail = new Vector3(collider.tail[0], collider.tail[1], collider.tail[2])
                     }
                 } else {
-                    offset = new Vector3(-collider.offset[0], collider.offset[1], -collider.offset[2])
+                    offset = new Vector3(collider.offset[0], collider.offset[1], collider.offset[2])
                 }
                 // if (collider.offset[1] < 0) {
                 //     offset = new Vector3(-collider.offset[1], collider.offset[0], collider.offset[2])
@@ -134,7 +134,7 @@ export class SpringBoneController10 {
                         // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
                         -0,
                         -1,
-                        -0
+                        0
                     ).normalize(),
                     0.7,
                     getBone(-1),
