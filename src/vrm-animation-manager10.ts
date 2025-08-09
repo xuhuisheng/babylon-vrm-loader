@@ -3,6 +3,8 @@
 // import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 // import type { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
 import type { Scene } from '@babylonjs/core/scene';
+import { Quaternion } from '@babylonjs/core/Maths/math';
+import { Vector3 } from '@babylonjs/core/Maths/math';
 // import type { Nullable } from '@babylonjs/core/types';
 // import { SpringBoneController10 } from './secondary-animation/spring-bone-controller10';
 // import { HumanoidBone } from './humanoid-bone';
@@ -21,6 +23,9 @@ export class VRMAnimationManager10 {
     public expressionMap: Map<number, string> = new Map<number, string>();
     public lookAtIndex: number = -1;
     public animationMap: Map<number, string> = new Map<number, string>();
+    public translationMap: Map<string, Vector3> = new Map<string, Vector3>();
+    public rotationMap: Map<string, Quaternion> = new Map<string, Quaternion>();
+    public parentMap: Map<string, string> = new Map<string, string>();
 
     public constructor(
         public readonly ext: IVRMAnimation,
@@ -39,10 +44,49 @@ export class VRMAnimationManager10 {
         if (this.ext && this.ext.humanoid && this.ext.humanoid.humanBones) {
             Object.keys(this.ext.humanoid.humanBones).forEach((key) => {
                 let value = this.ext.humanoid.humanBones[key];
-                if (value) {
-                    this.humanoidMap.set(value.node, key as string);
+                if (!value) {
+                    return;
                 }
-            });            
+                this.humanoidMap.set(value.node, key as string);
+
+            });
+
+            Object.keys(this.ext.humanoid.humanBones).forEach((key) => {
+                let value = this.ext.humanoid.humanBones[key];
+                if (!value) {
+                    return;
+                }
+
+                if (!this.loader.gltf || !this.loader.gltf.nodes) {
+                    return;
+                }
+
+                let node = this.loader.gltf.nodes[value.node];
+                if (!node) {
+                    return;
+                }
+                if (node.children) {
+                    node.children.forEach((nodeIndex) => {
+                        let childNodeName = this.humanoidMap.get(nodeIndex);
+                        if (!childNodeName) {
+                            console.log('unexists child', key, node, nodeIndex);
+                            return;
+                        }
+                        this.parentMap.set(childNodeName, key);
+                    });
+                }
+
+                if (node.rotation) {
+                    let quaternion = Quaternion.FromArray(node.rotation);
+                    this.rotationMap.set(key, quaternion);
+                }
+
+                if (node.translation) {
+                    let vector = Vector3.FromArray(node.translation);
+                    this.translationMap.set(key, vector);
+                }
+
+            });
         }
 
         if (this.ext && this.ext.expressions && this.ext.expressions.preset) {
