@@ -5,6 +5,7 @@ import type { IGLTFLoaderExtension, IMaterial, IMeshPrimitive } from '@babylonjs
 import { GLTFLoader } from '@babylonjs/loaders/glTF/2.0';
 import { VRMManager } from './vrm-manager';
 import { VRMManager10 } from './vrm-manager10';
+import { VRMAnimationManager10 } from './vrm-animation-manager10';
 import { VRMMaterialGenerator } from './vrm-material-generator';
 
 /**
@@ -60,28 +61,44 @@ export class VRM implements IGLTFLoaderExtension {
      * @inheritdoc
      */
     public onReady() {
-        if (!this.loader.gltf.extensions || (!this.loader.gltf.extensions[NAME] && !this.loader.gltf.extensions["VRMC_vrm"])) {
+        if (!this.loader.gltf.extensions || (!this.loader.gltf.extensions[NAME] && !this.loader.gltf.extensions["VRMC_vrm"] && !this.loader.gltf.extensions["VRMC_vrm_animation"])) {
             return;
         }
         const scene = this.loader.babylonScene;
         // const vrmExtension = this.loader.gltf.extensions[NAME] || this.loader.gltf.extensions["VRMC_vrm"]
         // const manager = new VRMManager(vrmExtension, this.loader.babylonScene, this.meshesFrom, this.transformNodesFrom, this.materialsFrom);
-        let manager : VRMManager;
         if (this.loader.gltf.extensions[NAME]) {
             // 0.x
-            manager = new VRMManager(this.loader.gltf.extensions[NAME], this.loader.babylonScene, this.meshesFrom, this.transformNodesFrom, this.materialsFrom);
-        } else {
+            let manager = new VRMManager(this.loader.gltf.extensions[NAME], this.loader.babylonScene, this.meshesFrom, this.transformNodesFrom, this.materialsFrom);
+
+            scene.metadata = scene.metadata || {};
+            scene.metadata.vrmManagers = scene.metadata.vrmManagers || [];
+            scene.metadata.vrmManagers.push(manager);
+            this.loader.babylonScene.onDisposeObservable.add(() => {
+                // Scene dispose 時に Manager も破棄する
+                manager.dispose();
+                this.loader.babylonScene.metadata.vrmManagers = [];
+            });
+        } else if (this.loader.gltf.extensions["VRMC_vrm"]) {
             // 1.0
-            manager = new VRMManager10(this.loader.gltf.extensions["VRMC_vrm"], this.loader.gltf.extensions["VRMC_springBone"], this.loader.babylonScene, this.meshesFrom, this.transformNodesFrom, this.materialsFrom);
+            let manager = new VRMManager10(this.loader.gltf.extensions["VRMC_vrm"], this.loader.gltf.extensions["VRMC_springBone"], this.loader.babylonScene, this.meshesFrom, this.transformNodesFrom, this.materialsFrom);
+
+            scene.metadata = scene.metadata || {};
+            scene.metadata.vrmManagers = scene.metadata.vrmManagers || [];
+            scene.metadata.vrmManagers.push(manager);
+            this.loader.babylonScene.onDisposeObservable.add(() => {
+                // Scene dispose 時に Manager も破棄する
+                manager.dispose();
+                this.loader.babylonScene.metadata.vrmManagers = [];
+            });
+        } else if (this.loader.gltf.extensions["VRMC_vrm_animation"]) {
+            // animation has no vrtManager, now
+            let vrmAnimationManager = new VRMAnimationManager10(this.loader.gltf.extensions["VRMC_vrm_animation"], this.loader, this.loader.babylonScene);
+            scene.metadata = scene.metadata || {};
+            scene.metadata.vrmAnimationManagers = scene.metadata.vrtAnimationManagers || [];
+            scene.metadata.vrmAnimationManagers.push(vrmAnimationManager);
+            return;
         }
-        scene.metadata = scene.metadata || {};
-        scene.metadata.vrmManagers = scene.metadata.vrmManagers || [];
-        scene.metadata.vrmManagers.push(manager);
-        this.loader.babylonScene.onDisposeObservable.add(() => {
-            // Scene dispose 時に Manager も破棄する
-            manager.dispose();
-            this.loader.babylonScene.metadata.vrmManagers = [];
-        });
     }
 
     /**

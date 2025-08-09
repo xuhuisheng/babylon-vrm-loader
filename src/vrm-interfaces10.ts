@@ -278,3 +278,42 @@ export interface IVRMMaterialProperty {
     keywordMap: IVRMMaterialPropertyKeywordMap;
     tagMap: IVRMMaterialPropertyTagMap;
 }
+
+// animation
+
+export interface IVRMAnimation {
+    specVersion: string;
+    humanoid: IVRMAnimationHumanoid;
+    expressions: IVRMAnimationExpressions;
+    lookAt: IVRMAnimationLookAtIndex;
+}
+
+export interface IVRMAnimationHumanoid {
+    humanBones: IVRMAnimationHumanoidMap;
+}
+
+export interface IVRMAnimationHumanoidMap {
+    [prop: string]: IVRMAnimationHumanoidIndex | undefined;
+}
+
+export interface IVRMAnimationHumanoidIndex {
+    node: number;
+}
+
+export interface IVRMAnimationExpressions {
+    preset: IVRMAnimationExpressionMap;
+}
+
+export interface IVRMAnimationExpressionMap {
+    [prop: string]: IVRMAnimationExpressionIndex | undefined;
+}
+
+export interface IVRMAnimationExpressionIndex {
+    node: number;
+}
+
+export interface IVRMAnimationLookAtIndex {
+    node: number;
+}
+
+
