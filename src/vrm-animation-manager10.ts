@@ -3,8 +3,10 @@
 // import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 // import type { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
 import type { Scene } from '@babylonjs/core/scene';
+import type { AssetContainer } from '@babylonjs/core/assetContainer';
 import { Quaternion } from '@babylonjs/core/Maths/math';
 import { Vector3 } from '@babylonjs/core/Maths/math';
+import { Matrix } from '@babylonjs/core/Maths/math';
 // import type { Nullable } from '@babylonjs/core/types';
 // import { SpringBoneController10 } from './secondary-animation/spring-bone-controller10';
 // import { HumanoidBone } from './humanoid-bone';
@@ -76,15 +78,17 @@ export class VRMAnimationManager10 {
                     });
                 }
 
-                if (node.rotation) {
-                    let quaternion = Quaternion.FromArray(node.rotation);
-                    this.rotationMap.set(key, quaternion);
-                }
+                // old start
+                // if (node.rotation) {
+                //     let quaternion = Quaternion.FromArray(node.rotation);
+                //     this.rotationMap.set(key, quaternion);
+                // }
 
-                if (node.translation) {
-                    let vector = Vector3.FromArray(node.translation);
-                    this.translationMap.set(key, vector);
-                }
+                // if (node.translation) {
+                //     let vector = Vector3.FromArray(node.translation);
+                //     this.translationMap.set(key, vector);
+                // }
+                // old end
 
             });
         }
@@ -120,6 +124,64 @@ export class VRMAnimationManager10 {
             }
             this.animationMap.set(channel.index, boneName);
         });
+    }
+
+    public updateMatrix(assetContainer: AssetContainer) {
+        Object.keys(this.ext.humanoid.humanBones).forEach((key) => {
+            let value = this.ext.humanoid.humanBones[key];
+            if (!value) {
+                return;
+            }
+
+            if (!this.loader.gltf || !this.loader.gltf.nodes) {
+                return;
+            }
+
+            let node = this.loader.gltf.nodes[value.node];
+            if (!node) {
+                return;
+            }
+            // test start
+            if (node.rotation) {
+                let matrix = this.findMatrix(assetContainer, value.node);
+                if (matrix) {
+                    let translation = Vector3.Zero();
+                    let quaternion = Quaternion.Zero();
+                    let scale = Vector3.Zero();
+                    matrix.decompose(translation, quaternion, scale);
+                    this.rotationMap.set(key, quaternion);
+                }
+            }
+
+            if (node.translation) {
+                let matrix = this.findMatrix(assetContainer, value.node);
+                if (matrix) {
+                    let translation = Vector3.Zero();
+                    let quaternion = Quaternion.Zero();
+                    let scale = Vector3.Zero();
+                    matrix.decompose(translation, quaternion, scale);
+                    this.translationMap.set(key, translation);
+                }
+            }
+            // test end
+        });
+    }
+
+    public findMatrix(assetContainer: AssetContainer, nodeIndex: number): Matrix | undefined {
+        if (!assetContainer || !assetContainer.transformNodes) {
+            return undefined;
+        }
+        let transformNode = assetContainer.transformNodes[nodeIndex];
+        if (!transformNode) {
+            return undefined;
+        }
+        let matrix = transformNode.computeWorldMatrix(true);
+        if (!matrix) {
+            return undefined;
+        }
+        // matrix.toggleModelMatrixHandInPlace();
+        matrix.toggleProjectionMatrixHandInPlace();
+        return matrix;
     }
 
 }
