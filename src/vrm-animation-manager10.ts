@@ -28,6 +28,7 @@ export class VRMAnimationManager10 {
     public translationMap: Map<string, Vector3> = new Map<string, Vector3>();
     public rotationMap: Map<string, Quaternion> = new Map<string, Quaternion>();
     public parentMap: Map<string, string> = new Map<string, string>();
+    public matrixMap: Map<string, Matrix> = new Map<string, Matrix>();
 
     public constructor(
         public readonly ext: IVRMAnimation,
@@ -143,7 +144,7 @@ export class VRMAnimationManager10 {
             }
             // test start
             if (node.rotation) {
-                let matrix = this.findMatrix(assetContainer, value.node);
+                let matrix = this.findMatrix(assetContainer, value.node, key);
                 if (matrix) {
                     let translation = Vector3.Zero();
                     let quaternion = Quaternion.Zero();
@@ -154,7 +155,7 @@ export class VRMAnimationManager10 {
             }
 
             if (node.translation) {
-                let matrix = this.findMatrix(assetContainer, value.node);
+                let matrix = this.findMatrix(assetContainer, value.node, key);
                 if (matrix) {
                     let translation = Vector3.Zero();
                     let quaternion = Quaternion.Zero();
@@ -167,7 +168,7 @@ export class VRMAnimationManager10 {
         });
     }
 
-    public findMatrix(assetContainer: AssetContainer, nodeIndex: number): Matrix | undefined {
+    public findMatrix(assetContainer: AssetContainer, nodeIndex: number, nodeName: string): Matrix | undefined {
         if (!assetContainer || !assetContainer.transformNodes) {
             return undefined;
         }
@@ -180,8 +181,15 @@ export class VRMAnimationManager10 {
             return undefined;
         }
         matrix = matrix.clone();
+        let array = matrix.toArray();
+        array[0] = -array[0];
+        array[4] = -array[4];
+        array[8] = -array[8];
+        array[12] = -array[12];
+        matrix = Matrix.FromArray(array);
         // matrix.toggleModelMatrixHandInPlace();
         // matrix.toggleProjectionMatrixHandInPlace();
+        this.matrixMap.set(nodeName, matrix);
         return matrix;
     }
 
