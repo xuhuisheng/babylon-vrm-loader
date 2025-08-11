@@ -185,7 +185,7 @@ export class VRMAnimationManager10 {
 
         // console.log(this.dumpQuaternion(r), r);
         let matrix = Matrix.Compose(s, r, t);
-        console.log(this.dumpMatrix(matrix));
+        // console.log(this.dumpMatrix(matrix));
 
         let nodeRestPostTree = new VRMNodeRestPostTree(nodeIndex, true);
         nodeRestPostTree.localMatrix = matrix;
@@ -227,7 +227,7 @@ export class VRMAnimationManager10 {
                     let translation = Vector3.Zero();
                     let quaternion = Quaternion.Zero();
                     let scale = Vector3.Zero();
-                    matrix.decompose(translation, quaternion, scale);
+                    matrix.decompose(scale, quaternion, translation);
                     this.rotationMap.set(key, quaternion);
                 }
             }
@@ -238,7 +238,7 @@ export class VRMAnimationManager10 {
                     let translation = Vector3.Zero();
                     let quaternion = Quaternion.Zero();
                     let scale = Vector3.Zero();
-                    matrix.decompose(translation, quaternion, scale);
+                    matrix.decompose(scale, quaternion, translation);
                     this.translationMap.set(key, translation);
                 }
             }
