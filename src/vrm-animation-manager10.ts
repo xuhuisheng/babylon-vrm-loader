@@ -180,15 +180,19 @@ export class VRMAnimationManager10 {
         if (!matrix) {
             return undefined;
         }
+        
         matrix = matrix.clone();
-        let array = matrix.toArray();
-        array[0] = -array[0];
-        array[4] = -array[4];
-        array[8] = -array[8];
-        array[12] = -array[12];
-        matrix = Matrix.FromArray(array);
+        
+        // let array = matrix.toArray();
+        // array[0] = -array[0];
+        // array[4] = -array[4];
+        // array[8] = -array[8];
+        // array[12] = -array[12];
+        // matrix = Matrix.FromArray(array);
+        
         // matrix.toggleModelMatrixHandInPlace();
         // matrix.toggleProjectionMatrixHandInPlace();
+        
         this.matrixMap.set(nodeName, matrix);
         return matrix;
     }
