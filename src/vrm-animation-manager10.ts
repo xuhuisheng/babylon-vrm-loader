@@ -179,8 +179,9 @@ export class VRMAnimationManager10 {
         if (!matrix) {
             return undefined;
         }
+        matrix = matrix.clone();
         // matrix.toggleModelMatrixHandInPlace();
-        matrix.toggleProjectionMatrixHandInPlace();
+        // matrix.toggleProjectionMatrixHandInPlace();
         return matrix;
     }
 
