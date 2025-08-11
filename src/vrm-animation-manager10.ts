@@ -16,6 +16,7 @@ import type { IVRMAnimation } from './vrm-interfaces10';
 // import { VRMManager } from './vrm-manager'
 // import { IsBinaryMap, MorphTargetMap, MaterialValueBindingMergerMap, TransformNodeMap, TransformNodeCache, MeshCache, HumanBoneName } from './vrm-interfaces-defines';
 import { GLTFLoader } from '@babylonjs/loaders/glTF/2.0';
+import { VRMNodeRestPostTree } from './vrm-node-rest-post-tree';
 
 /**
  * VRM キャラクターを動作させるためのマネージャ
@@ -30,6 +31,8 @@ export class VRMAnimationManager10 {
     public parentMap: Map<string, string> = new Map<string, string>();
     public matrixMap: Map<string, Matrix> = new Map<string, Matrix>();
 
+    public nodeRestPostTree: VRMNodeRestPostTree;
+
     public constructor(
         public readonly ext: IVRMAnimation,
         public readonly loader: GLTFLoader,
@@ -41,6 +44,9 @@ export class VRMAnimationManager10 {
 
         // console.log(loader);
         // console.log(scene);
+
+        this.constructNodeRestPostTree();
+        this.constructKeyFrames();
     }
 
     public constructIndex() {
@@ -127,6 +133,78 @@ export class VRMAnimationManager10 {
         });
     }
 
+    public constructNodeRestPostTree() {
+        let root = this.buildNodeRestPostTree(0, true);
+        if (root) {
+            this.nodeRestPostTree = root
+        }
+    }
+
+    public buildNodeRestPostTree(nodeIndex: number, root: boolean): VRMNodeRestPostTree | undefined {
+        if (!this.loader || !this.loader.gltf || !this.loader.gltf.nodes) {
+            return undefined;
+        }
+
+        let node = this.loader.gltf.nodes[nodeIndex];
+        if (!node) {
+            return undefined;
+        }
+
+        let t = Vector3.Zero();
+        if (node.translation) {
+            t = Vector3.FromArray(node.translation as number[]);
+        }
+        if (!t) {
+            t = Vector3.Zero();
+        } else {
+            // TODO: blender
+            t = new Vector3(t.x, -t.z, t.y);
+        }
+
+        let r = new Quaternion(0, 0, 0, 1);
+        if (node.rotation) {
+            r = Quaternion.FromArray(node.rotation as number[]);
+        }
+        if (!r) {
+            r = new Quaternion(0, 0, 0, 1);
+        } else {
+            // TODO: blender
+            r = new Quaternion(r.x, -r.z, r.y, r.w);
+        }
+
+        let s = new Vector3(1, 1, 1);
+        if (node.scale) {
+            s = Vector3.FromArray(node.scale as number[]);
+        }
+        if (!s) {
+            s = new Vector3(1, 1, 1);
+        } else {
+            // TODO: blender
+            s = new Vector3(s.x, s.z, s.y);
+        }
+
+        // console.log(this.dumpQuaternion(r), r);
+        let matrix = Matrix.Compose(s, r, t);
+        console.log(this.dumpMatrix(matrix));
+
+        let nodeRestPostTree = new VRMNodeRestPostTree(nodeIndex, true);
+        nodeRestPostTree.localMatrix = matrix;
+
+        if (node.children) {            
+            for (let childNodeIndex of node.children) {
+                let childNode = this.buildNodeRestPostTree(childNodeIndex, false);
+                if (childNode) {
+                    nodeRestPostTree.children.push(childNode);
+                }
+            }
+        }
+        return nodeRestPostTree;
+    }
+
+    public constructKeyFrames() {
+        // let root = this.nodeRestPostTree;
+    }
+
     public updateMatrix(assetContainer: AssetContainer) {
         Object.keys(this.ext.humanoid.humanBones).forEach((key) => {
             let value = this.ext.humanoid.humanBones[key];
@@ -195,6 +273,28 @@ export class VRMAnimationManager10 {
         
         this.matrixMap.set(nodeName, matrix);
         return matrix;
+    }
+
+    public dumpMatrix(matrix: Matrix): string {
+        let t = Vector3.Zero();
+        let r = Quaternion.Zero();
+        let s = Vector3.Zero();
+        matrix.decompose(s, r, t);
+        let euler = r.toEulerAngles();
+
+        let text = 'T=(';
+        text += t.x.toFixed(2) + ',' + t.y.toFixed(2) + ',' + t.z.toFixed(2)
+        text += '),R=(' + (euler.x / Math.PI * 180).toFixed(2) + ',' + (euler.y / Math.PI * 180).toFixed(2) + ',' + (euler.z / Math.PI * 180).toFixed(2)
+        // text += r.x.toFixed(2) + ',' + r.y.toFixed(2) + ',' + r.z.toFixed(2) + ',' + r.w.toFixed(2)
+        text += '),S=('
+        text += s.x.toFixed(2) + ',' + s.y.toFixed(2) + ',' + s.z.toFixed(2)
+        text += ')';
+        return text;
+    }
+
+    public dumpQuaternion(r: Quaternion): string {
+        let euler = r.toEulerAngles();
+        return (euler.x / Math.PI * 180).toFixed(2) + ',' + (euler.y / Math.PI * 180).toFixed(2) + ',' + (euler.z / Math.PI * 180).toFixed(2)
     }
 
 }
