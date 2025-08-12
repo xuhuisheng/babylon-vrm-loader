@@ -176,7 +176,8 @@ export class VRMAnimationManager10 {
             let parentMatrix = parentNode.localMatrix;
             let parentRotation = Quaternion.Zero();
             parentMatrix.decompose(undefined, parentRotation, undefined);
-            r = r.multiply(parentRotation);
+            // r = r.multiply(parentRotation);
+            r = parentRotation.multiply(r);
         }
 
         let s = new Vector3(1, 1, 1);
