@@ -135,13 +135,13 @@ export class VRMAnimationManager10 {
     }
 
     public constructNodeRestPostTree() {
-        let root = this.buildNodeRestPostTree(0, true);
+        let root = this.buildNodeRestPostTree(0, true, undefined);
         if (root) {
             this.nodeRestPostTree = root
         }
     }
 
-    public buildNodeRestPostTree(nodeIndex: number, root: boolean): VRMNodeRestPostTree | undefined {
+    public buildNodeRestPostTree(nodeIndex: number, root: boolean, parentNode: VRMNodeRestPostTree | undefined): VRMNodeRestPostTree | undefined {
         if (!this.loader || !this.loader.gltf || !this.loader.gltf.nodes) {
             return undefined;
         }
@@ -172,6 +172,12 @@ export class VRMAnimationManager10 {
             // TODO: blender
             // r = new Quaternion(r.x, -r.z, r.y, r.w);
         }
+        if (parentNode) {
+            let parentMatrix = parentNode.localMatrix;
+            let parentRotation = Quaternion.Zero();
+            parentMatrix.decompose(undefined, parentRotation, undefined);
+            r = r.multiply(parentRotation);
+        }
 
         let s = new Vector3(1, 1, 1);
         if (node.scale) {
@@ -193,7 +199,7 @@ export class VRMAnimationManager10 {
 
         if (node.children) {            
             for (let childNodeIndex of node.children) {
-                let childNode = this.buildNodeRestPostTree(childNodeIndex, false);
+                let childNode = this.buildNodeRestPostTree(childNodeIndex, false, nodeRestPostTree);
                 if (childNode) {
                     nodeRestPostTree.children.push(childNode);
                 }
