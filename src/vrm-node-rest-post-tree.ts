@@ -21,6 +21,7 @@ import { Matrix } from '@babylonjs/core/Maths/math';
  * VRM キャラクターを動作させるためのマネージャ
  */
 export class VRMNodeRestPostTree {
+    public nodeName: string;
     public localMatrix: Matrix;
     public children: Array<VRMNodeRestPostTree> = new Array<VRMNodeRestPostTree>();
 

@@ -32,6 +32,7 @@ export class VRMAnimationManager10 {
     public matrixMap: Map<string, Matrix> = new Map<string, Matrix>();
 
     public nodeRestPostTree: VRMNodeRestPostTree;
+    public nodeRestPostTreeMap: Map<string, VRMNodeRestPostTree> = new Map<string, VRMNodeRestPostTree>();
 
     public constructor(
         public readonly ext: IVRMAnimation,
@@ -158,7 +159,7 @@ export class VRMAnimationManager10 {
             t = Vector3.Zero();
         } else {
             // TODO: blender
-            t = new Vector3(t.x, -t.z, t.y);
+            // t = new Vector3(t.x, -t.z, t.y);
         }
 
         let r = new Quaternion(0, 0, 0, 1);
@@ -169,7 +170,7 @@ export class VRMAnimationManager10 {
             r = new Quaternion(0, 0, 0, 1);
         } else {
             // TODO: blender
-            r = new Quaternion(r.x, -r.z, r.y, r.w);
+            // r = new Quaternion(r.x, -r.z, r.y, r.w);
         }
 
         let s = new Vector3(1, 1, 1);
@@ -180,7 +181,7 @@ export class VRMAnimationManager10 {
             s = new Vector3(1, 1, 1);
         } else {
             // TODO: blender
-            s = new Vector3(s.x, s.z, s.y);
+            // s = new Vector3(s.x, s.z, s.y);
         }
 
         // console.log(this.dumpQuaternion(r), r);
@@ -198,6 +199,14 @@ export class VRMAnimationManager10 {
                 }
             }
         }
+
+        let nodeName = this.humanoidMap.get(nodeIndex);
+        if (!nodeName) {
+            nodeName = '' + nodeIndex;
+        }
+        nodeRestPostTree.nodeName = nodeName;
+        this.nodeRestPostTreeMap.set(nodeName, nodeRestPostTree);
+
         return nodeRestPostTree;
     }
 
