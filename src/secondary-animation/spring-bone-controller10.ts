@@ -208,7 +208,7 @@ export class SpringBoneController10 {
         return springs;
     }
 
-    private _importJoint(node: TransformNode | null, child: TransformNode | null, setting: VRMSpringBoneJointSetting10, colliderGroupsForSpring: ColliderGroup10[]): VRMSpringBoneJoint10 {
+    private _importJoint(node: Nullable<TransformNode>, child: TransformNode | null, setting: VRMSpringBoneJointSetting10, colliderGroupsForSpring: ColliderGroup10[]): VRMSpringBoneJoint10 {
         let joint = new VRMSpringBoneJoint10(node, child, setting, colliderGroupsForSpring)
         return joint;
     }

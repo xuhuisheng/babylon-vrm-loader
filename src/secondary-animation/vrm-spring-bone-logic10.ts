@@ -1,4 +1,5 @@
 import { Matrix, Quaternion, Vector3 } from '@babylonjs/core/Maths/math';
+import type { Mesh } from '@babylonjs/core';
 import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import type { Nullable } from '@babylonjs/core/types';
 import type { Collider10 } from './collider10';
@@ -52,6 +53,8 @@ export class VRMSpringBoneLogic10 {
     private prevTail: Vector3 = new Vector3();
     private nextTail: Vector3 = new Vector3();
 
+    private inside: boolean = false
+
     /**
      * @param center Center reference of TransformNode
      * @param radius Collision Radius
@@ -99,7 +102,7 @@ export class VRMSpringBoneLogic10 {
     //         this.centerSpaceBoneLength = _v3A.subtractInPlace(this.centerSpacePosition).length();
     //     }
     // }
-    public constructor(public readonly center: Nullable<TransformNode> | undefined, public readonly radius: number | null, public readonly transform: TransformNode, public joint : Nullable<VRMSpringBoneJoint10>) {
+    public constructor(public readonly center: Nullable<TransformNode>, public readonly radius: number, public readonly transform: TransformNode, public joint : Nullable<VRMSpringBoneJoint10>) {
         // Initialize rotationQuaternion when not initialized
         if (!transform.rotationQuaternion) {
             transform.rotationQuaternion = transform.rotation.toQuaternion();
@@ -250,10 +253,12 @@ export class VRMSpringBoneLogic10 {
     private collide(colliderGroups: ColliderGroup10[], tail: Vector3) {
         colliderGroups.forEach((colliderGroup) => {
             colliderGroup.colliders.forEach((collider) => {
-                if (collider.sphere && this.collideSphere(collider, tail)) {
-                    //
-                } else if (collider.sphereTail && this.collideCapsule(collider, tail)) {
-                    //
+                if (collider.type == 'sphere') {
+                    this.collideSphere(collider, tail)
+                } else if (collider.type == 'capsule') {
+                    this.collideCapsule(collider, tail)
+                } else {
+                    console.log('unsupport collider type', collider.type)
                 }
             });
         });
@@ -285,51 +290,106 @@ export class VRMSpringBoneLogic10 {
     }
 
     private collideCapsule(collider: Collider10, tail: Vector3) {
-
-        this.getMatrixWorldToCenter(_matA);
-        collider.sphere.computeWorldMatrix().multiplyToRef(_matA, _matA);
-        _matA.getTranslationToRef(_v3A);
-        const colliderCenterSpacePosition = _v3A;
-
-        let maxAbsScale = 0;
-        collider.sphere.absoluteScaling.asArray().forEach((s) => {
-            maxAbsScale = Math.max(maxAbsScale, Math.abs(s));
-        });
-        const colliderRadius = collider.radius * maxAbsScale;
-        const r = (this.radius ? this.radius : 0.1) + colliderRadius;
-
-        tail.subtractToRef(colliderCenterSpacePosition, _v3B);
-        if (_v3B.lengthSquared() <= r * r) {
-            const normal = _v3B.copyFrom(tail).subtractInPlace(colliderCenterSpacePosition).normalize();
-            const posFromCollider = _v3C.copyFrom(colliderCenterSpacePosition).addInPlace(normal.scaleInPlace(r));
-
-            tail.copyFrom(
-                posFromCollider.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(this.centerSpaceBoneLength).addInPlace(this.centerSpacePosition)
-            );
-        } else if (collider.sphereTail) {
-
-            this.getMatrixWorldToCenter(_matA);
-            collider.sphere.computeWorldMatrix().multiplyToRef(_matA, _matA);
-            _matA.getTranslationToRef(_v3A);
-            const colliderCenterSpacePosition = _v3A;
-
-            let maxAbsScale = 0;
-            collider.sphereTail.absoluteScaling.asArray().forEach((s) => {
-                maxAbsScale = Math.max(maxAbsScale, Math.abs(s));
-            });
-            const colliderRadius = collider.radius * maxAbsScale;
-            const r = (this.radius ? this.radius : 0.1) + colliderRadius;
-
-            tail.subtractToRef(colliderCenterSpacePosition, _v3B);
-            if (_v3B.lengthSquared() <= r * r) {
-                const normal = _v3B.copyFrom(tail).subtractInPlace(colliderCenterSpacePosition).normalize();
-                const posFromCollider = _v3C.copyFrom(colliderCenterSpacePosition).addInPlace(normal.scaleInPlace(r));
-
-                tail.copyFrom(
-                    posFromCollider.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(this.centerSpaceBoneLength).addInPlace(this.centerSpacePosition)
-                ); 
-            }
+        if (!collider.sphere || !collider.sphereTail) {
+            return;
         }
-        return _v3B.lengthSquared() <= r * r
+
+        const transformedOffset = this.calculateTransformedOffset(collider.sphere);
+
+        const transformedTail = this.calculateTransformedTail(collider);
+
+        const offsetToTail = transformedTail.subtract(transformedOffset);
+
+        const lengthSqCapsule = offsetToTail.lengthSquared();
+
+        let delta = tail.subtract(transformedOffset);
+
+        const dot = offsetToTail.dot(delta);
+
+        if (dot <= 0.0) {
+            // if object is near from the head
+            // do nothing, use the current value directly
+        } else if (dot >= lengthSqCapsule) {
+            // if object is near from the tail
+            delta = delta.subtract(offsetToTail); // from tail to object
+        } else {
+            // if object is between two ends
+            delta = delta.subtract(offsetToTail.scale(dot / lengthSqCapsule));
+        }
+
+        const objectRadius = collider.radius;
+
+        const length = delta.length();
+        const distance = this.inside ? this.radius - objectRadius - length : length - objectRadius - this.radius;
+
+        if (distance < 0) {
+
+            delta = delta.scale(1 / length); // convert the delta to the direction
+            if (this.inside) {
+                delta = delta.negate(); // if inside, reverse the direction
+            }
+
+            // hit
+            tail.addInPlace(delta.scale(-distance));
+
+            // normalize bone length
+            tail.subtractInPlace(this.centerSpacePosition);
+            const tailLength = tail.length();
+            tail.copyFrom(
+                tail.scale(this.centerSpaceBoneLength / tailLength).add(this.centerSpacePosition)
+            );
+        }
+
+        return distance;
+    }
+
+    public calculateTransformedOffset(mesh: Mesh): Vector3 {
+        this.getMatrixWorldToCenter(_matA);
+        mesh.computeWorldMatrix().multiplyToRef(_matA, _matA);
+        _matA.getTranslationToRef(_v3A);
+        const colliderCenterSpacePosition = _v3A.clone();
+
+        return colliderCenterSpacePosition;
+    }
+
+    public calculateTransformedTail(collider: Collider10): Vector3 {
+        if (!collider.sphereTail) {
+            return Vector3.Zero();
+        }
+        this.getMatrixWorldToCenter(_matA);
+
+        // const transformedTail = collider.tail.clone()
+        //     .subtract(collider.offset)
+        //     .multiply(_matA);
+        collider.sphereTail.computeWorldMatrix()
+            .multiplyToRef(_matA, _matA);
+
+        _matA.getTranslationToRef(_v3A);
+
+        const colliderCenterSpacePosition = _v3A.clone();
+
+        return colliderCenterSpacePosition;
+    }
+
+    public dumpMatrix(matrix: Matrix): string {
+        let t = Vector3.Zero();
+        let r = Quaternion.Zero();
+        let s = Vector3.Zero();
+        matrix.decompose(s, r, t);
+        let euler = r.toEulerAngles();
+
+        let text = 'T=(';
+        text += t.x.toFixed(2) + ',' + t.y.toFixed(2) + ',' + t.z.toFixed(2)
+        text += '),R=(' + (euler.x / Math.PI * 180).toFixed(2) + ',' + (euler.y / Math.PI * 180).toFixed(2) + ',' + (euler.z / Math.PI * 180).toFixed(2)
+        // text += r.x.toFixed(2) + ',' + r.y.toFixed(2) + ',' + r.z.toFixed(2) + ',' + r.w.toFixed(2)
+        text += '),S=('
+        text += s.x.toFixed(2) + ',' + s.y.toFixed(2) + ',' + s.z.toFixed(2)
+        text += ')';
+        return text;
+    }
+
+    public dumpQuaternion(r: Quaternion): string {
+        let euler = r.toEulerAngles();
+        return (euler.x / Math.PI * 180).toFixed(2) + ',' + (euler.y / Math.PI * 180).toFixed(2) + ',' + (euler.z / Math.PI * 180).toFixed(2)
     }
 }

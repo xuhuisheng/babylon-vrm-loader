@@ -8,3 +8,4 @@ export * from './vrm-file-loader';
 export * from './vrm-interfaces';
 export * from './vrm-manager';
 export * from './vrm-material-generator';
+export * from './secondary-animation/spring-bone-controller10';

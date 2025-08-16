@@ -1,7 +1,7 @@
 // import { Matrix, Quaternion, Vector3 } from '@babylonjs/core/Maths/math';
 // import { Vector3 } from '@babylonjs/core/Maths/math';
 import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-// import type { Nullable } from '@babylonjs/core/types';
+import type { Nullable } from '@babylonjs/core/types';
 import type { ColliderGroup10 } from './collider-group10';
 import { VRMSpringBoneJointSetting10 } from './vrm-spring-bone-joint-setting10'
 // based on
@@ -28,7 +28,7 @@ export class VRMSpringBoneJoint10 {
 
     public center: TransformNode;
 
-    public constructor(public node: TransformNode | null, public child: TransformNode | null, public setting: VRMSpringBoneJointSetting10, public colliderGroupsForSpring: ColliderGroup10[]) {
+    public constructor(public node: Nullable<TransformNode>, public child: TransformNode | null, public setting: VRMSpringBoneJointSetting10, public colliderGroupsForSpring: ColliderGroup10[]) {
     }
 
 }

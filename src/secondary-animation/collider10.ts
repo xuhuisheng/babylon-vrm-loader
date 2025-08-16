@@ -12,6 +12,7 @@ export class Collider10 {
      * @param sphere The spehere mesh for worldMatrix and gizmo.
      */
     public constructor(
+        public readonly type: string,
         public readonly offset: Vector3,
         public readonly tail: Vector3 | null,
         public readonly radius: number,

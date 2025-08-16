@@ -1,6 +1,7 @@
 import type { Vector3 } from '@babylonjs/core/Maths/math';
 import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import { SphereBuilder } from '@babylonjs/core/Meshes/Builders/sphereBuilder';
+import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import { Collider10 } from './collider10';
 
 /**
@@ -21,6 +22,10 @@ export class ColliderGroup10 {
      * @param radius The radius of the collider.
      */
     public addCollider(offset: Vector3, tail: Vector3 | null, radius: number, transform: TransformNode) {
+        const material = new StandardMaterial('cube-mtl');
+        material.wireframe = false;
+
+        let type = 'sphere';
         const sphere = SphereBuilder.CreateSphere(
             `${transform.name}_ColliderSphere`,
             {
@@ -34,9 +39,11 @@ export class ColliderGroup10 {
         // sphere.setPositionWithLocalVector(offset);
         sphere.position = offset;
         sphere.setEnabled(false);
+        sphere.material = material;
 
         let sphereTail = null
         if (tail) {
+            type = 'capsule';
             sphereTail = SphereBuilder.CreateSphere(
                 `${transform.name}_ColliderSphereTail`,
                 {
@@ -50,8 +57,9 @@ export class ColliderGroup10 {
             // sphereTail.setPositionWithLocalVector(tail);
             sphereTail.position = tail;
             sphereTail.setEnabled(false);
+            sphereTail.material = material;
         }
 
-        this.colliders.push(new Collider10(offset, tail, radius, sphere, sphereTail, transform));
+        this.colliders.push(new Collider10(type, offset, tail, radius, sphere, sphereTail, transform));
     }
 }

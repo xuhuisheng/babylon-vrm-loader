@@ -68,7 +68,11 @@ export class VRMSpringBone10 {
             // [bone].concat(bone.child.getChildTransformNodes()).forEach((b) => {
             //     this.verlets.push(new VRMSpringBoneLogic10(this.center, bone.hitRadius, b, bone));
             // });
-            this.verlets.push(new VRMSpringBoneLogic10(this.center, bone.setting.hitRadius, bone.child, bone));
+            this.verlets.push(new VRMSpringBoneLogic10(
+                this.center ?? null,
+                bone.setting.hitRadius ?? 0.1,
+                bone.child,
+                bone));
         });
     }
 
