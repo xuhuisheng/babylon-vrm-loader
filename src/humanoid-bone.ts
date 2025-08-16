@@ -1,5 +1,6 @@
-import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
+import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import type { Nullable } from '@babylonjs/core/types';
+import { Matrix } from '@babylonjs/core/Maths/math';
 import { BoneNotFoundError } from './errors';
 
 interface TransformNodeMap {
@@ -11,7 +12,15 @@ interface TransformNodeMap {
  * @see https://docs.unity3d.com/ja/2018.3/ScriptReference/HumanBodyBones.html
  */
 export class HumanoidBone {
-    public constructor(private nodeMap: TransformNodeMap) {}
+
+    protected matrixMap: Map<string, Matrix> = new Map<string, Matrix>();
+
+    public constructor(private nodeMap: TransformNodeMap) {
+        for (let nodeName of Object.keys(nodeMap)) {
+            let node = nodeMap[nodeName];
+            this.matrixMap.set(nodeName, node.computeWorldMatrix());
+        }
+    }
 
     public dispose() {
         (this.nodeMap as any) = null;
