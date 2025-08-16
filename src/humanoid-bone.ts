@@ -1,6 +1,7 @@
+import { Matrix } from '@babylonjs/core/Maths/math';
+import { Quaternion } from '@babylonjs/core/Maths/math';
 import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import type { Nullable } from '@babylonjs/core/types';
-import { Matrix } from '@babylonjs/core/Maths/math';
 import { BoneNotFoundError } from './errors';
 
 interface TransformNodeMap {
@@ -18,7 +19,7 @@ export class HumanoidBone {
     public constructor(private nodeMap: TransformNodeMap) {
         for (let nodeName of Object.keys(nodeMap)) {
             let node = nodeMap[nodeName];
-            this.matrixMap.set(nodeName, node.computeWorldMatrix());
+            this.matrixMap.set(nodeName, Matrix.Compose(node.scaling, node.rotationQuaternion ?? new Quaternion(0, 0, 0, 1), node.position));
         }
     }
 
