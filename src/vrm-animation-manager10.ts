@@ -86,18 +86,6 @@ export class VRMAnimationManager10 {
                     });
                 }
 
-                // old start
-                // if (node.rotation) {
-                //     let quaternion = Quaternion.FromArray(node.rotation);
-                //     this.rotationMap.set(key, quaternion);
-                // }
-
-                // if (node.translation) {
-                //     let vector = Vector3.FromArray(node.translation);
-                //     this.translationMap.set(key, vector);
-                // }
-                // old end
-
             });
         }
 
@@ -135,7 +123,17 @@ export class VRMAnimationManager10 {
     }
 
     public constructNodeRestPostTree() {
-        let root = this.buildNodeRestPostTree(0, true, undefined);
+        let hipsNodeIndex = -1;
+        this.humanoidMap.forEach((value, key) => {
+            if (value == 'hips') {
+                hipsNodeIndex = key;
+            }
+        })
+        if (hipsNodeIndex == -1) {
+            console.error('cannot find hips:', hipsNodeIndex);
+        }
+
+        let root = this.buildNodeRestPostTree(hipsNodeIndex, true, undefined);
         if (root) {
             this.nodeRestPostTree = root
         }
@@ -276,16 +274,6 @@ export class VRMAnimationManager10 {
         }
         
         matrix = matrix.clone();
-        
-        // let array = matrix.toArray();
-        // array[0] = -array[0];
-        // array[4] = -array[4];
-        // array[8] = -array[8];
-        // array[12] = -array[12];
-        // matrix = Matrix.FromArray(array);
-        
-        // matrix.toggleModelMatrixHandInPlace();
-        // matrix.toggleProjectionMatrixHandInPlace();
         
         this.matrixMap.set(nodeName, matrix);
         return matrix;
