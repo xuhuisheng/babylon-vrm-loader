@@ -51,16 +51,18 @@ export class HumanoidBone {
             childMatrix = Matrix.Compose(scaling, rotation, translation);
         } else if (boneName == 'hips') {
             // let parentRotation = new Quaternion(-0.7071067690849304, 0, 0, 0.7071067690849304);
+            const transformNode = this.nodeMap['hips']?.parent as TransformNode;
+            let parentRotation = transformNode?.rotationQuaternion ?? new Quaternion(0, 0, 0, 1);
 
-            // childMatrix = childMatrix.clone();
-            // let scaling  = Vector3.Zero();
-            // let rotation = Quaternion.Zero();
-            // let translation = Vector3.Zero();
-            // childMatrix.decompose(scaling, rotation, translation);
+            childMatrix = childMatrix.clone();
+            let scaling  = Vector3.Zero();
+            let rotation = Quaternion.Zero();
+            let translation = Vector3.Zero();
+            childMatrix.decompose(scaling, rotation, translation);
 
-            // rotation = parentRotation.multiply(rotation);
+            rotation = parentRotation.multiply(rotation);
 
-            // childMatrix = Matrix.Compose(scaling, rotation, translation);
+            childMatrix = Matrix.Compose(scaling, rotation, translation);
         }
         this.worldMatrixMap.set(boneName, childMatrix);
 
