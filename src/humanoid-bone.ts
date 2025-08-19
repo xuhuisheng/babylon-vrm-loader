@@ -1,8 +1,10 @@
 import { Matrix } from '@babylonjs/core/Maths/math';
 import { Quaternion } from '@babylonjs/core/Maths/math';
+import { Vector3 } from '@babylonjs/core/Maths/math';
 import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import type { Nullable } from '@babylonjs/core/types';
 import { BoneNotFoundError } from './errors';
+import { findHumanoidChildrenBones } from './vrm-interfaces-defines'
 
 interface TransformNodeMap {
     [name: string]: TransformNode;
@@ -15,12 +17,58 @@ interface TransformNodeMap {
 export class HumanoidBone {
 
     protected matrixMap: Map<string, Matrix> = new Map<string, Matrix>();
+    protected worldMatrixMap: Map<string, Matrix> = new Map<string, Matrix>();
 
     public constructor(private nodeMap: TransformNodeMap) {
         for (let nodeName of Object.keys(nodeMap)) {
             let node = nodeMap[nodeName];
             this.matrixMap.set(nodeName, Matrix.Compose(node.scaling, node.rotationQuaternion ?? new Quaternion(0, 0, 0, 1), node.position));
         }
+
+        // tree
+        this.calculateWorldMatrix('hips', '')
+    }
+
+    public calculateWorldMatrix(boneName: string, parentName: string) {
+        var childMatrix = this.matrixMap.get(boneName);
+        if (!childMatrix) {
+            console.log('[HumanoidBone.calculateWorldMatrix] skip child: ${boneName}');
+            return;
+        }
+        var parentMatrix = this.worldMatrixMap.get(parentName);
+        if (parentMatrix) {
+            let parentRotation = Quaternion.Zero();
+            parentMatrix.decompose(undefined, parentRotation, undefined);
+
+            childMatrix = childMatrix.clone();
+            let scaling  = Vector3.Zero();
+            let rotation = Quaternion.Zero();
+            let translation = Vector3.Zero();
+            childMatrix.decompose(scaling, rotation, translation);
+
+            rotation = parentRotation.multiply(rotation);
+            // rotation = rotation.multiply(parentRotation);
+            // console.log(boneName, 'rotation', rotation);
+
+            childMatrix = Matrix.Compose(scaling, rotation, translation);
+        } else if (boneName == 'hips') {
+            let parentRotation = new Quaternion(-0.7071067690849304, 0, 0, 0.7071067690849304);
+
+            childMatrix = childMatrix.clone();
+            let scaling  = Vector3.Zero();
+            let rotation = Quaternion.Zero();
+            let translation = Vector3.Zero();
+            childMatrix.decompose(scaling, rotation, translation);
+
+            rotation = parentRotation.multiply(rotation);
+            // rotation = rotation.multiply(parentRotation);
+            // console.log(boneName, 'rotation', rotation);
+
+            childMatrix = Matrix.Compose(scaling, rotation, translation);
+        }
+        this.worldMatrixMap.set(boneName, childMatrix);
+
+        findHumanoidChildrenBones(boneName).forEach((childBoneName) => this.calculateWorldMatrix(childBoneName, boneName))
     }
 
     public dispose() {

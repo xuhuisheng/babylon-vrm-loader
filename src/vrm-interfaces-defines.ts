@@ -96,3 +96,89 @@ export type HumanBoneName =
     | 'upperChest'
     | string;
 
+export function findHumanoidChildrenBones(boneName: string): Array<string> {
+    if (boneName == 'hips') {
+        return ['spine', 'leftUpperLeg', 'rightUpperLeg'];
+    } else if (boneName == 'spine') {
+        return ['chest'];
+    } else if (boneName == 'chest') {
+        return ['upperChest'];
+    } else if (boneName == 'upperChest') {
+        return ['neck'];
+    } else if (boneName == 'neck') {
+        return ['head', 'leftShoulder', 'rightShoulder'];
+    } else if (boneName == 'head') {
+        return ['leftEye', 'rightEye', 'jaw'];
+    } else if (boneName == 'leftShoulder') {
+        return ['leftUpperArm'];
+    } else if (boneName == 'leftUpperArm') {
+        return ['leftLowerArm'];
+    } else if (boneName == 'leftLowerArm') {
+        return ['leftHand'];
+    } else if (boneName == 'leftHand') {
+        return ['leftThumbMetacarpal', 'leftIndexProximal', 'leftMiddleProximal', 'leftRingProximal', 'leftLittleProximal'];
+    } else if (boneName == 'leftThumbMetacarpal') {
+        return ['leftThumbProximal'];
+    } else if (boneName == 'leftThumbProximal') {
+        return ['leftThumbDistal'];
+    } else if (boneName == 'leftIndexProximal') {
+        return ['leftIndexIntermediate'];
+    } else if (boneName == 'leftIndexIntermediate') {
+        return ['leftIndexDistal'];
+    } else if (boneName == 'leftMiddleProximal') {
+        return ['leftMiddleIntermediate'];
+    } else if (boneName == 'leftMiddleIntermediate') {
+        return ['leftMiddleDistal'];
+    } else if (boneName == 'leftRingProximal') {
+        return ['leftRingIntermediate'];
+    } else if (boneName == 'leftRingIntermediate') {
+        return ['leftRingDistal'];
+    } else if (boneName == 'leftLittleProximal') {
+        return ['leftLittleIntermediate'];
+    } else if (boneName == 'leftLittleIntermediate') {
+        return ['leftLittleDistal'];
+    } else if (boneName == 'rightShoulder') {
+        return ['rightUpperArm'];
+    } else if (boneName == 'rightUpperArm') {
+        return ['rightLowerArm'];
+    } else if (boneName == 'rightLowerArm') {
+        return ['rightHand'];
+    } else if (boneName == 'rightHand') {
+        return ['rightThumbMetacarpal', 'rightIndexProximal', 'rightMiddleProximal', 'rightRingProximal', 'rightLittleProximal'];
+    } else if (boneName == 'rightThumbMetacarpal') {
+        return ['rightThumbProximal'];
+    } else if (boneName == 'rightThumbProximal') {
+        return ['rightThumbDistal'];
+    } else if (boneName == 'rightIndexProximal') {
+        return ['rightIndexIntermediate'];
+    } else if (boneName == 'rightIndexIntermediate') {
+        return ['rightIndexDistal'];
+    } else if (boneName == 'rightMiddleProximal') {
+        return ['rightMiddleIntermediate'];
+    } else if (boneName == 'rightMiddleIntermediate') {
+        return ['rightMiddleDistal'];
+    } else if (boneName == 'rightRingProximal') {
+        return ['rightRingIntermediate'];
+    } else if (boneName == 'rightRingIntermediate') {
+        return ['rightRingDistal'];
+    } else if (boneName == 'rightLittleProximal') {
+        return ['rightLittleIntermediate'];
+    } else if (boneName == 'rightLittleIntermediate') {
+        return ['rightLittleDistal'];
+    } else if (boneName == 'leftUpperLeg') {
+        return ['leftLowerLeg'];
+    } else if (boneName == 'leftLowerLeg') {
+        return ['leftFoot'];
+    } else if (boneName == 'leftFoot') {
+        return ['leftToes'];
+    } else if (boneName == 'rightUpperLeg') {
+        return ['rightLowerLeg'];
+    } else if (boneName == 'rightLowerLeg') {
+        return ['rightFoot'];
+    } else if (boneName == 'rightFoot') {
+        return ['rightToes'];
+    } else {
+        return [];
+    }
+
+}
