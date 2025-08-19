@@ -79,7 +79,7 @@ export class VRMAnimationManager10 {
                     node.children.forEach((nodeIndex) => {
                         let childNodeName = this.humanoidMap.get(nodeIndex);
                         if (!childNodeName) {
-                            console.log(`[vrm-animation-manager] unexists child, parent name: ${key}, child node index: ${nodeIndex}, node:`, node);
+                            console.log(`[vrm-animation-manager.constructIndex] unexists child, parent name: ${key}, child node index: ${nodeIndex}, node:`, node);
                             return;
                         }
                         this.parentMap.set(childNodeName, key);
@@ -115,7 +115,7 @@ export class VRMAnimationManager10 {
             }
             let boneName = this.humanoidMap.get(channel.target.node);
             if (!boneName) {
-                console.log('skip bone', channel.target.node)
+                console.log('[vrm-animation-manager.constructAnimation] skip bone', channel.target.node)
                 return;
             }
             this.animationMap.set(channel.index, boneName);

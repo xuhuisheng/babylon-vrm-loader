@@ -32,7 +32,7 @@ export class HumanoidBone {
     public calculateWorldMatrix(boneName: string, parentName: string) {
         var childMatrix = this.matrixMap.get(boneName);
         if (!childMatrix) {
-            console.log('[HumanoidBone.calculateWorldMatrix] skip child: ${boneName}');
+            console.log(`[HumanoidBone.calculateWorldMatrix] skip child: ${boneName}, parentName: ${parentName}`);
             return;
         }
         var parentMatrix = this.worldMatrixMap.get(parentName);
@@ -47,24 +47,20 @@ export class HumanoidBone {
             childMatrix.decompose(scaling, rotation, translation);
 
             rotation = parentRotation.multiply(rotation);
-            // rotation = rotation.multiply(parentRotation);
-            // console.log(boneName, 'rotation', rotation);
 
             childMatrix = Matrix.Compose(scaling, rotation, translation);
         } else if (boneName == 'hips') {
-            let parentRotation = new Quaternion(-0.7071067690849304, 0, 0, 0.7071067690849304);
+            // let parentRotation = new Quaternion(-0.7071067690849304, 0, 0, 0.7071067690849304);
 
-            childMatrix = childMatrix.clone();
-            let scaling  = Vector3.Zero();
-            let rotation = Quaternion.Zero();
-            let translation = Vector3.Zero();
-            childMatrix.decompose(scaling, rotation, translation);
+            // childMatrix = childMatrix.clone();
+            // let scaling  = Vector3.Zero();
+            // let rotation = Quaternion.Zero();
+            // let translation = Vector3.Zero();
+            // childMatrix.decompose(scaling, rotation, translation);
 
-            rotation = parentRotation.multiply(rotation);
-            // rotation = rotation.multiply(parentRotation);
-            // console.log(boneName, 'rotation', rotation);
+            // rotation = parentRotation.multiply(rotation);
 
-            childMatrix = Matrix.Compose(scaling, rotation, translation);
+            // childMatrix = Matrix.Compose(scaling, rotation, translation);
         }
         this.worldMatrixMap.set(boneName, childMatrix);
 

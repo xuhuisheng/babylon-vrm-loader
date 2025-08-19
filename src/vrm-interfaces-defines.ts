@@ -104,9 +104,9 @@ export function findHumanoidChildrenBones(boneName: string): Array<string> {
     } else if (boneName == 'chest') {
         return ['upperChest'];
     } else if (boneName == 'upperChest') {
-        return ['neck'];
+        return ['neck', 'leftShoulder', 'rightShoulder'];
     } else if (boneName == 'neck') {
-        return ['head', 'leftShoulder', 'rightShoulder'];
+        return ['head'];
     } else if (boneName == 'head') {
         return ['leftEye', 'rightEye', 'jaw'];
     } else if (boneName == 'leftShoulder') {
