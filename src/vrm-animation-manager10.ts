@@ -79,7 +79,7 @@ export class VRMAnimationManager10 {
                     node.children.forEach((nodeIndex) => {
                         let childNodeName = this.humanoidMap.get(nodeIndex);
                         if (!childNodeName) {
-                            console.log(`unexists child name: ${key}, nodeIndex: ${nodeIndex}, node:`, node);
+                            console.log(`[vrm-animation-manager] unexists child, parent name: ${key}, child node index: ${nodeIndex}, node:`, node);
                             return;
                         }
                         this.parentMap.set(childNodeName, key);

@@ -302,6 +302,7 @@ export interface IVRMAnimationHumanoidIndex {
 
 export interface IVRMAnimationExpressions {
     preset: IVRMAnimationExpressionMap;
+    custom?: IVRMAnimationExpressionMap;
 }
 
 export interface IVRMAnimationExpressionMap {
