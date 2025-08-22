@@ -145,6 +145,10 @@ export class VRMSpringBoneLogic10 {
         }
     }
 
+    public isNull(o: any) : boolean {
+        return typeof o == 'undefined' || o == null;
+    }
+
     /**
      * Update Tail position
      *
@@ -155,12 +159,13 @@ export class VRMSpringBoneLogic10 {
      */
     // public update(stiffnessForce: number, dragForce: number, external: Vector3, colliderGroups: ColliderGroup10[]): void {
     public update(colliderGroups: ColliderGroup10[], deltaTime: number): void {
-        if (!this.joint || !this.joint.setting || !this.joint.setting.stiffness || !this.joint.setting.gravityDir || !this.joint.setting.gravityPower || !this.joint.setting.dragForce) {
+        if (!this.joint || !this.joint.setting || this.isNull(this.joint.setting.stiffness)
+                || !this.joint.setting.gravityDir || this.isNull(this.joint.setting.gravityPower)  || this.isNull(this.joint.setting.dragForce)) {
             return;
         }
 
-        const stiffness = this.joint.setting.stiffness * deltaTime;
-        const external = this.joint.setting.gravityDir.scale(this.joint.setting.gravityPower * deltaTime);
+        const stiffness = (this.joint.setting.stiffness ?? 0) * deltaTime;
+        const external = this.joint.setting.gravityDir.scale((this.joint.setting.gravityPower ?? 0) * deltaTime);
 
         const stiffnessForce = stiffness;
         const dragForce = this.joint.setting.dragForce
@@ -186,7 +191,7 @@ export class VRMSpringBoneLogic10 {
             // 減衰付きで前のフレームの移動を継続
             _v3A.copyFrom(this.currentTail)
                 .subtractInPlace(this.prevTail)
-                .scaleInPlace(1.0 - dragForce);
+                .scaleInPlace(1.0 - (dragForce ?? 0));
             this.nextTail.addInPlace(_v3A);
         }
         {
