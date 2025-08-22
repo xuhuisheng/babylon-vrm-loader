@@ -62,7 +62,7 @@ export class VRMSpringBone10 {
         ) {
 
         this.joints.forEach((bone) => {
-            if (!bone || !bone.child) {
+            if (!bone || !bone.node) {
                 return
             }
             // [bone].concat(bone.child.getChildTransformNodes()).forEach((b) => {
@@ -71,7 +71,7 @@ export class VRMSpringBone10 {
             this.verlets.push(new VRMSpringBoneLogic10(
                 this.center ?? null,
                 bone.setting.hitRadius ?? 0.1,
-                bone.child,
+                bone.node,
                 bone));
         });
     }
