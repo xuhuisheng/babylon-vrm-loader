@@ -1,1 +1,2 @@
-export * from './vmd-anim';
+export * from './bvh-anim';
+// export * from './vmd-anim';

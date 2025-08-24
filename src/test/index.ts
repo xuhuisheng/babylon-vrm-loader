@@ -9,7 +9,8 @@ import { Vector3 } from '@babylonjs/core/Maths/math';
 import { Mesh } from '@babylonjs/core/Meshes/mesh';
 import { Scene } from '@babylonjs/core/scene';
 import type { VRMManager } from '../vrm-manager';
-import { VmdAnim} from '../animation';
+import { BvhAnim } from '../animation';
+// import { VmdAnim } from '../animation';
 
 import '@babylonjs/core/Helpers/sceneHelpers';
 import '@babylonjs/core/Meshes/Builders/sphereBuilder';
@@ -95,9 +96,10 @@ async function main() {
     await SceneLoader.AppendAsync('./', 'VRM1_Constraint_Twist_Sample.vrm', scene);
 
     //
-    const vmdAnim = new VmdAnim();
-    // console.log(vmdAnim);
-    vmdAnim.init();
+    // const vmdAnim = new VmdAnim();
+    // vmdAnim.init();
+    const bvhAnim = new BvhAnim();
+    bvhAnim.init(scene);
 
     let fileCount = 1;
     (document.getElementById('file-input') as HTMLInputElement).addEventListener('change', (evt) => {

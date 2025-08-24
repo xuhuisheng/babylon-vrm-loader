@@ -5,7 +5,8 @@ import { Quaternion } from '@babylonjs/core/Maths/math';
 // import { Parser, VmdFile, CharsetEncoder } from 'mmd-parser';
 import { Parser, CharsetEncoder } from 'mmd-parser';
 import { VRMIKHandler } from './vrm-ik-handler';
-import { NumberKeyframeTrack, VectorKeyframeTrack, QuaternionKeyframeTrack, AnimationClip, KeyframeTrack, VRMHumanBoneName, LerpKeyframe } from './math-utils';
+import { VRMHumanBoneName } from './math-utils';
+import { NumberKeyframeTrack, VectorKeyframeTrack, QuaternionKeyframeTrack, AnimationClip, KeyframeTrack, LerpKeyframe } from './math-utils';
 import { VMD_VRM_MORTH_MAP, IK_OFFSET_INIT, VRM_VMD_BONE_MAP, MathUtils, VMD_VRM_IK_MAP, HumanoidBoneName, isTruely } from './math-utils';
 import { VRMOffsets, VMDBoneNames, AnimationData, Timeline, VMDMorphNames, VMD_BONE_NAMES, Keyframe } from './math-utils';
 
@@ -517,3 +518,4 @@ public localizeTimeline(...tls: [Keyframe[], Keyframe[]]) {
 	}
 
 }
+
