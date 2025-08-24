@@ -60,22 +60,16 @@ export class BvhAnim {
     // const { clip, skeleton } = new BVHLoader().parse(textDecoder.decode(data));
     const skeleton = ReadBvh(textDecoder.decode(buffer), scene, null, {loopMode: 1});
     // console.log('skeleton', skeleton)
+    // for (let bone of skeleton.bones){
+    //     console.log(bone.name)
+    // }
 
     const vrmManager = scene.metadata.vrmManagers[0];
     // console.log('vrmManager', vrmManager)
     const humanoid = vrmManager.humanoidBone;
 
     const skeletonMap = detectSkeleton(skeleton);
-    console.log('skeletonMap', skeletonMap, skeletonMap.entries())
-
-    // function findOriginalBone(name) {
-    // 		for (let bone of skeleton.bones) {
-    // 				if (bone.name == name) {
-    // 						return bone
-    // 				}
-    // 		}
-    // 		return null;
-    // }
+    // console.log('skeletonMap', skeletonMap, skeletonMap.entries())
 
     const newAnimationGroup = new AnimationGroup("new-animation-group");
 
@@ -210,6 +204,10 @@ function getSpineAndHips(
   if (hips.getChildren().length !== 3)
     throw new TypeError('Hips require 3 children.');
   map.set(
+    HumanoidBoneName.Hips,
+    hips
+  );
+  map.set(
     HumanoidBoneName.Spine,
     selectBone(
       (l, r) => (centerOfDescendant(l).y > centerOfDescendant(r).y ? l : r),
@@ -219,14 +217,42 @@ function getSpineAndHips(
   map.set(
     HumanoidBoneName.LeftUpperLeg,
     selectBone(
-      (l, r) => (centerOfDescendant(l).x < centerOfDescendant(r).x ? l : r),
+      (l, r) => {
+      	const diff = centerOfDescendant(l).x - centerOfDescendant(r).x;
+      	if (diff < 0) {
+      		return l;
+      	} if (diff > 0) {
+      		return r;
+      	} else if (l.name.toLowerCase().indexOf('left') != -1) {
+    			return l;
+      	} else if (r.name.toLowerCase().indexOf('left') != -1) {
+      		return r;
+      	} else {
+      		console.log('cannot find left upper leg', l, r)
+      		return l
+      	}
+      },
       hips.getChildren()
     )
   );
   map.set(
     HumanoidBoneName.RightUpperLeg,
     selectBone(
-      (l, r) => (centerOfDescendant(l).x > centerOfDescendant(r).x ? l : r),
+      (l, r) => {
+      	const diff = centerOfDescendant(l).x - centerOfDescendant(r).x;
+      	if (diff > 0) {
+      		return l;
+      	} if (diff < 0) {
+      		return r;
+      	} else if (l.name.toLowerCase().indexOf('right') != -1) {
+    			return l;
+      	} else if (r.name.toLowerCase().indexOf('right') != -1) {
+      		return r;
+      	} else {
+      		console.log('cannot find right upper leg', l, r)
+      		return r
+      	}
+      },
       hips.getChildren()
     )
   );
@@ -248,14 +274,42 @@ function getNeckAndArms(
   map.set(
     HumanoidBoneName.LeftShoulder,
     selectBone(
-      (l, r) => (centerOfDescendant(l).x < centerOfDescendant(r).x ? l : r),
+      (l, r) => {
+      	const diff = centerOfDescendant(l).x - centerOfDescendant(r).x;
+      	if (diff < 0) {
+      		return l;
+      	} if (diff > 0) {
+      		return r;
+      	} else if (l.name.toLowerCase().indexOf('left') != -1) {
+    			return l;
+      	} else if (r.name.toLowerCase().indexOf('left') != -1) {
+      		return r;
+      	} else {
+      		console.log('cannot find left upper arm', l, r)
+      		return l
+      	}
+      },
       chest.getChildren()
     )
   );
   map.set(
     HumanoidBoneName.RightShoulder,
     selectBone(
-      (l, r) => (centerOfDescendant(l).x > centerOfDescendant(r).x ? l : r),
+      (l, r) => {
+      	const diff = centerOfDescendant(l).x - centerOfDescendant(r).x;
+      	if (diff > 0) {
+      		return l;
+      	} if (diff < 0) {
+      		return r;
+      	} else if (l.name.toLowerCase().indexOf('right') != -1) {
+    			return l;
+      	} else if (r.name.toLowerCase().indexOf('right') != -1) {
+      		return r;
+      	} else {
+      		console.log('cannot find right upper arm', l, r)
+      		return r
+      	}
+      },
       chest.getChildren()
     )
   );
@@ -272,6 +326,7 @@ function getArm(
       )
     )
   );
+  // console.log('getArm isRight', isRight, bones)
   switch (bones.length) {
     case 0:
     case 1:
@@ -303,6 +358,7 @@ function getArm(
       );
       break;
   }
+  // console.log('getArm', map)
 }
 
 function getLeg(
@@ -378,6 +434,7 @@ function detectSkeleton(skeleton: Skeleton) {
   if (!hips) throw new TypeError('Hips not found');
   const map = new Map<HumanoidBoneName, TransformNode>();
   getSpineAndHips(hips, map);
+  // console.log('after getSpineAndHips', map);
   getLeg(map, false);
   getLeg(map, true);
   const spineToChest: TransformNode[] = [];
@@ -385,7 +442,14 @@ function detectSkeleton(skeleton: Skeleton) {
     spineToChest.push(x);
     if (x.getChildren().length === 3) break;
   }
+  // console.log('after spineToChest', spineToChest)
   getNeckAndArms(spineToChest[spineToChest.length - 1], map);
+  // console.log('after getNeckAndArms', map)
+  // if (1) {
+  // 	const finalMap = new Map<string, [HumanoidBoneName, TransformNode]>();
+	//   return finalMap;
+  // }
+  // console.log('before getArm', map);
   getArm(map, false);
   getArm(map, true);
   const necktoHead = Array.from(transverse(map.get(HumanoidBoneName.Neck)));
@@ -427,8 +491,10 @@ function detectSkeleton(skeleton: Skeleton) {
       break;
   }
   const finalMap = new Map<string, [HumanoidBoneName, TransformNode]>();
-  for (const [boneName, bone] of map)
+  for (const [boneName, bone] of map) {
     finalMap.set(bone.name, [boneName, bone]);
+  }
+  // console.log('finalMap', map, finalMap)
   return finalMap;
 }
 
