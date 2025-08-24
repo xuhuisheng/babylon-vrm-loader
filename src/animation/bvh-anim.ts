@@ -69,7 +69,7 @@ export class BvhAnim {
     const humanoid = vrmManager.humanoidBone;
 
     const skeletonMap = detectSkeleton(skeleton);
-    // console.log('skeletonMap', skeletonMap, skeletonMap.entries())
+    // console.log('skeletonMap', skeletonMap)
 
     const newAnimationGroup = new AnimationGroup("new-animation-group");
 
@@ -77,7 +77,7 @@ export class BvhAnim {
     skeletonMap.forEach((boneValue, boneKey) => {
     	  const boneName = boneValue[0]
     	  const bone = boneValue[1]
-    		// console.log(bone, boneName)
+    		// console.log(bone, boneName, boneKey)
         bone.animations.forEach((animation, indexAnimation) => {
             const targetProperty = animation.targetProperty;
             // const boneName = bone.name.toLowerCase();
@@ -93,9 +93,9 @@ export class BvhAnim {
             if (!boneNode) {
                 return;
             }
-            if (targetProperty == 'position') {
-            	return;
-            }
+            // if (targetProperty == 'position') {
+            // 	return;
+            // }
 
             if (targetProperty == 'rotationQuaternion') {
 
@@ -116,6 +116,10 @@ export class BvhAnim {
                     animation.getKeys().forEach((keyFrame) => {
                         let quaternion = keyFrame.value
 
+                        if (boneName == 'leftUpperLeg') {
+	                        // console.log('quaternion before', keyFrame, quaternion)
+                        }
+
                         {
                             quaternion = parentQuaternion.multiply(quaternion).multiply(childQuaternion)
 
@@ -123,13 +127,23 @@ export class BvhAnim {
                             if (matrix) {                                
                                 let rotate = Quaternion.Zero()
                                 matrix.decompose(null, rotate, null)
-                                quaternion = quaternion.multiply(rotate)
+                                // quaternion = quaternion.multiply(rotate)
                             }
                         }
 
-                        keyFrame.value = quaternion
+                        if (boneName == 'leftUpperLeg') {
+	                        // console.log('quaternion after', quaternion)
+                        }
+
+                        // keyFrame.value = quaternion
+                        // keyFrame.value = new Quaternion(-quaternion.x, quaternion.y, quaternion.z, quaternion.w);
 
                     })
+            } else if (targetProperty == 'position') {
+                    animation.getKeys().forEach((keyFrame) => {
+                        let position = keyFrame.value
+                        keyFrame.value = position.scale(0.02)
+                    });
             }
 
             newAnimationGroup.addTargetedAnimation(animation, boneNode);
@@ -372,12 +386,14 @@ function getLeg(
       )
     )
   );
+  // console.log('getLeg isRight', isRight, bones.length, bones)
   switch (bones.length) {
     case 0:
     case 1:
     case 2:
       throw new TypeError(`Not supported (${bones.length})`);
     case 3:
+    	// upperLeg, lowerLeg, foot
       map.set(
         isRight
           ? HumanoidBoneName.RightUpperLeg
@@ -395,7 +411,31 @@ function getLeg(
         bones[2]
       );
       break;
+    case 5:
+    	// upperLeg, lowerLeg, foot, toe, ENDSITE
+      map.set(
+        isRight
+          ? HumanoidBoneName.RightUpperLeg
+          : HumanoidBoneName.LeftUpperLeg,
+        bones[bones.length - 5]
+      );
+      map.set(
+        isRight
+          ? HumanoidBoneName.RightLowerLeg
+          : HumanoidBoneName.LeftLowerLeg,
+        bones[bones.length - 4]
+      );
+      map.set(
+        isRight ? HumanoidBoneName.RightFoot : HumanoidBoneName.LeftFoot,
+        bones[bones.length - 3]
+      );
+      map.set(
+        isRight ? HumanoidBoneName.RightToes : HumanoidBoneName.LeftToes,
+        bones[bones.length - 2]
+      );
+      break;
     default:
+    	// upperLeg, lowerLeg, foot, toe
       map.set(
         isRight
           ? HumanoidBoneName.RightUpperLeg
