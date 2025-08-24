@@ -16,6 +16,7 @@ import '@babylonjs/core/Helpers/sceneHelpers';
 import '@babylonjs/core/Meshes/Builders/sphereBuilder';
 import '@babylonjs/core/Meshes/Builders/torusKnotBuilder';
 import '@babylonjs/inspector';
+import { SkeletonViewer } from '@babylonjs/core/Debug/skeletonViewer';
 // eslint-disable-next-line import/no-internal-modules
 import '../index';
 
@@ -98,8 +99,17 @@ async function main() {
     //
     // const vmdAnim = new VmdAnim();
     // vmdAnim.init();
+    const bvhPath = './0018_Moonwalk001.bvh'
+    // const bvhPath = './ArmsHipHopDance_mixamo_rightYXZ_action.bvh'
+    // const bvhPath = './C_test.bvh'
+    // const bvhPath = './walk-cycle.bvh'
     const bvhAnim = new BvhAnim();
-    bvhAnim.init(scene);
+    bvhAnim.init(bvhPath, scene);
+
+                const viewer = new SkeletonViewer(scene.skeletons[0], null, scene, false, 1, {
+                    displayMode: SkeletonViewer.DISPLAY_SPHERE_AND_SPURS,
+                });
+                viewer.isEnabled = true;
 
     let fileCount = 1;
     (document.getElementById('file-input') as HTMLInputElement).addEventListener('change', (evt) => {

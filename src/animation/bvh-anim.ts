@@ -1,9 +1,9 @@
 import { Vector3 } from '@babylonjs/core/Maths/math';
 import { Quaternion } from '@babylonjs/core/Maths/math';
 import { Skeleton } from '@babylonjs/core/Bones/skeleton';
-// import { Bone } from '@babylonjs/core/Bones/bone';
+import { Bone } from '@babylonjs/core/Bones/bone';
 // import { Node } from '@babylonjs/core/node';
-import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
+// import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import type { Scene } from '@babylonjs/core/scene';
 // import type { Nullable } from '@babylonjs/core/types';
 // import { Animation } from '@babylonjs/core/Animations/animation';
@@ -19,12 +19,13 @@ import { ReadBvh } from './bvhLoader';
 // const tempV3 = new Vector3();
 
 export class BvhAnim {
-  public init(scene: Scene): void {
-    console.log('start')
+  public init(uri: string, scene: Scene): void {
+    // console.log('start')
 
     const self = this
 
-    const filePath = './0018_Moonwalk001.bvh'
+    // const filePath = './0018_Moonwalk001.bvh'
+    const filePath = uri;
     const xhrFile = new XMLHttpRequest()
     xhrFile.open('GET', filePath, true)
     xhrFile.responseType = "arraybuffer";
@@ -33,7 +34,7 @@ export class BvhAnim {
     }
     xhrFile.send()
 
-    console.log('end')
+    // console.log('end')
   }
 
   public onLoad(response: any, scene: Scene): any {
@@ -121,6 +122,8 @@ export class BvhAnim {
                         }
 
                         {
+                        		// quaternion = new Quaternion(-quaternion.x, quaternion.y, -quaternion.z, quaternion.w);
+
                             quaternion = parentQuaternion.multiply(quaternion).multiply(childQuaternion)
 
                             let matrix = humanoid.matrixMap.get(boneName)
@@ -128,6 +131,7 @@ export class BvhAnim {
                                 let rotate = Quaternion.Zero()
                                 matrix.decompose(null, rotate, null)
                                 // quaternion = quaternion.multiply(rotate)
+                                quaternion = rotate.invert().multiply(quaternion).multiply(rotate);
                             }
                         }
 
@@ -136,7 +140,7 @@ export class BvhAnim {
                         }
 
                         // keyFrame.value = quaternion
-                        // keyFrame.value = new Quaternion(-quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+                        // keyFrame.value = new Quaternion(-quaternion.x, quaternion.y, -quaternion.z, quaternion.w);
 
                     })
             } else if (targetProperty == 'position') {
@@ -195,15 +199,15 @@ export class BvhAnim {
   }
 }
 
-function getRoot(bones: TransformNode[]) {
+function getRoot(bones: Bone[]) {
   const hips = bones.filter((x) => x.parent == null);
   if (hips.length !== 1) throw new TypeError('Requires unique root.');
   return hips[0];
 }
 
 function selectBone(
-  selector: (l: TransformNode, r: TransformNode) => TransformNode,
-  bones: TransformNode[]
+  selector: (l: Bone, r: Bone) => Bone,
+  bones: Bone[]
 ) {
   if (!bones || !bones.length) throw new TypeError('No bones.');
   let current = bones[0];
@@ -212,8 +216,8 @@ function selectBone(
 }
 
 function getSpineAndHips(
-  hips: TransformNode,
-  map: Map<HumanoidBoneName, TransformNode>
+  hips: Bone,
+  map: Map<HumanoidBoneName, Bone>
 ) {
   if (hips.getChildren().length !== 3)
     throw new TypeError('Hips require 3 children.');
@@ -231,53 +235,28 @@ function getSpineAndHips(
   map.set(
     HumanoidBoneName.LeftUpperLeg,
     selectBone(
-      (l, r) => {
-      	const diff = centerOfDescendant(l).x - centerOfDescendant(r).x;
-      	if (diff < 0) {
-      		return l;
-      	} if (diff > 0) {
-      		return r;
-      	} else if (l.name.toLowerCase().indexOf('left') != -1) {
-    			return l;
-      	} else if (r.name.toLowerCase().indexOf('left') != -1) {
-      		return r;
-      	} else {
-      		console.log('cannot find left upper leg', l, r)
-      		return l
-      	}
-      },
+      (l, r) => (centerOfDescendant(l).x > centerOfDescendant(r).x ? l : r),
       hips.getChildren()
     )
   );
   map.set(
     HumanoidBoneName.RightUpperLeg,
     selectBone(
-      (l, r) => {
-      	const diff = centerOfDescendant(l).x - centerOfDescendant(r).x;
-      	if (diff > 0) {
-      		return l;
-      	} if (diff < 0) {
-      		return r;
-      	} else if (l.name.toLowerCase().indexOf('right') != -1) {
-    			return l;
-      	} else if (r.name.toLowerCase().indexOf('right') != -1) {
-      		return r;
-      	} else {
-      		console.log('cannot find right upper leg', l, r)
-      		return r
-      	}
-      },
+      (l, r) => (centerOfDescendant(l).x < centerOfDescendant(r).x ? l : r),
       hips.getChildren()
     )
   );
 }
 
 function getNeckAndArms(
-  chest: TransformNode,
-  map: Map<HumanoidBoneName, TransformNode>
+  chest: Bone,
+  map: Map<HumanoidBoneName, Bone>
 ) {
-  if (chest.getChildren().length !== 3)
+	// console.log('getNeckAndArms before', chest, chest.getChildren().length)
+  if (chest.getChildren().length !== 3) {
+  	console.log('chest', chest)
     throw new TypeError('Chest require 3 children.');
+  }
   map.set(
     HumanoidBoneName.Neck,
     selectBone(
@@ -288,49 +267,22 @@ function getNeckAndArms(
   map.set(
     HumanoidBoneName.LeftShoulder,
     selectBone(
-      (l, r) => {
-      	const diff = centerOfDescendant(l).x - centerOfDescendant(r).x;
-      	if (diff < 0) {
-      		return l;
-      	} if (diff > 0) {
-      		return r;
-      	} else if (l.name.toLowerCase().indexOf('left') != -1) {
-    			return l;
-      	} else if (r.name.toLowerCase().indexOf('left') != -1) {
-      		return r;
-      	} else {
-      		console.log('cannot find left upper arm', l, r)
-      		return l
-      	}
-      },
+      (l, r) => (centerOfDescendant(l).x > centerOfDescendant(r).x ? l : r),
       chest.getChildren()
     )
   );
   map.set(
     HumanoidBoneName.RightShoulder,
     selectBone(
-      (l, r) => {
-      	const diff = centerOfDescendant(l).x - centerOfDescendant(r).x;
-      	if (diff > 0) {
-      		return l;
-      	} if (diff < 0) {
-      		return r;
-      	} else if (l.name.toLowerCase().indexOf('right') != -1) {
-    			return l;
-      	} else if (r.name.toLowerCase().indexOf('right') != -1) {
-      		return r;
-      	} else {
-      		console.log('cannot find right upper arm', l, r)
-      		return r
-      	}
-      },
+      (l, r) => (centerOfDescendant(l).x < centerOfDescendant(r).x ? l : r),
       chest.getChildren()
     )
   );
+  // console.log('getNeckAndArms after', map)
 }
 
 function getArm(
-  map: Map<HumanoidBoneName, TransformNode>,
+  map: Map<HumanoidBoneName, Bone>,
   isRight?: boolean
 ) {
   const bones = Array.from(
@@ -376,7 +328,7 @@ function getArm(
 }
 
 function getLeg(
-  map: Map<HumanoidBoneName, TransformNode>,
+  map: Map<HumanoidBoneName, Bone>,
   isRight?: boolean
 ) {
   const bones = Array.from(
@@ -462,31 +414,36 @@ function getLeg(
 
 function detectSkeleton(skeleton: Skeleton) {
 
-  const bones = skeleton.bones as unknown as TransformNode[];
+  const bones = skeleton.bones as unknown as Bone[];
 
   const root = getRoot(bones);
-  let hips: TransformNode | null | undefined;
+  let hips: Bone | null | undefined;
   for (const x of transverse(root))
     if (x.getChildren().length === 3) {
       hips = x;
       break;
     }
   if (!hips) throw new TypeError('Hips not found');
-  const map = new Map<HumanoidBoneName, TransformNode>();
+  // console.log('hips', hips)
+  const map = new Map<HumanoidBoneName, Bone>();
   getSpineAndHips(hips, map);
-  // console.log('after getSpineAndHips', map);
+  // console.log('getSpineAndHips after', map);
   getLeg(map, false);
   getLeg(map, true);
-  const spineToChest: TransformNode[] = [];
+  const spineToChest: Bone[] = [];
+  // console.log('spineToChest before', map, map.get(HumanoidBoneName.Spine))
   for (const x of transverse(map.get(HumanoidBoneName.Spine))) {
     spineToChest.push(x);
     if (x.getChildren().length === 3) break;
   }
-  // console.log('after spineToChest', spineToChest)
-  getNeckAndArms(spineToChest[spineToChest.length - 1], map);
+  // console.log('spineToChest after', spineToChest)
+  // var chestBone = spineToChest[spineToChest.length - 1];
+  var chestBone = spineToChest[spineToChest.length - 1];
+  // console.log('chestBone', chestBone)
+  getNeckAndArms(chestBone, map);
   // console.log('after getNeckAndArms', map)
   // if (1) {
-  // 	const finalMap = new Map<string, [HumanoidBoneName, TransformNode]>();
+  // 	const finalMap = new Map<string, [HumanoidBoneName, Bone]>();
 	//   return finalMap;
   // }
   // console.log('before getArm', map);
@@ -524,13 +481,13 @@ function detectSkeleton(skeleton: Skeleton) {
       break;
     default:
       map.set(HumanoidBoneName.Neck, spineToChest[0]);
-      let head: TransformNode | null | undefined;
+      let head: Bone | null | undefined;
       for (const x of necktoHead) if (x.parent!.getChildren().length === 1) head = x;
       if (!head) throw new TypeError('Head not found');
       map.set(HumanoidBoneName.Head, head);
       break;
   }
-  const finalMap = new Map<string, [HumanoidBoneName, TransformNode]>();
+  const finalMap = new Map<string, [HumanoidBoneName, Bone]>();
   for (const [boneName, bone] of map) {
     finalMap.set(bone.name, [boneName, bone]);
   }
@@ -538,35 +495,47 @@ function detectSkeleton(skeleton: Skeleton) {
   return finalMap;
 }
 
-export function centerOfDescendant(self: TransformNode) {
+export function centerOfDescendant(self: Bone) {
+	// if (self.id == 'Ab') {
+	// 	console.log('centerOfDescendant', self.id, self.position)
+	// }
+
   const sum = new Vector3();
   const temp = new Vector3();
   let i = 0;
   for (const current of transverse(self)) {
+		// if (self.id == 'Ab') {
+		// 	console.log('centerOfDescendant', self.id, 'current', current.id, current)
+		// }
     // temp.copy(current.position);
     temp.copyFrom(current.position);
+		// if (self.id == 'Ab') {
+		// 	console.log('centerOfDescendant', self.id, 'temp', temp)
+		// }
     let { parent } = current.parent!;
     while (parent) {
 
-      let transformNode = parent as TransformNode
-      if (!transformNode || !transformNode.rotationQuaternion) continue;
+      let parentBone = parent as Bone
+      if (!parentBone || !parentBone.rotationQuaternion) continue;
 
       // temp.applyQuaternion(parent.quaternion).add(parent.position);
-      temp.applyRotationQuaternionInPlace(transformNode.rotationQuaternion)
-        .addInPlace(transformNode.position);
+      temp.applyRotationQuaternionInPlace(parentBone.rotationQuaternion)
+        .addInPlace(parentBone.position);
+      // temp.addInPlace(parentBone.position);
+
       if (parent === self) break;
-      parent = parent.parent as TransformNode;
+      parent = parent.parent as Bone;
     }
-    sum.add(temp);
+    sum.addInPlace(temp);
     i++;
   }
   // return sum.divideScalar(i);
   return sum.scale(1 / i);
 }
 
-export function* transverse(self?: TransformNode | null): IterableIterator<TransformNode> {
+export function* transverse(self?: Bone | null): IterableIterator<Bone> {
   if (!self) return;
-  const stack: TransformNode[] = [self];
+  const stack: Bone[] = [self];
   const stackIndex = [0];
   yield self;
   while (stack.length) {
@@ -574,9 +543,9 @@ export function* transverse(self?: TransformNode | null): IterableIterator<Trans
     const currentIndex = stackIndex.pop()!;
     if (current.getChildren().length <= currentIndex)
       continue;
-    stack.push(current, current.getChildren()[currentIndex] as TransformNode);
+    stack.push(current, current.getChildren()[currentIndex] as Bone);
     stackIndex.push(currentIndex + 1, 0);
-    yield current.getChildren()[currentIndex] as TransformNode;
+    yield current.getChildren()[currentIndex] as Bone;
   }
 }
 
