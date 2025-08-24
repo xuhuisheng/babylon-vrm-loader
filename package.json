@@ -23,7 +23,8 @@
     "typings": "dist/index.d.ts",
     "main": "dist/index.module.js",
     "dependencies": {
-        "babylon-mtoon-material": "file:../babylon-mtoon-material"
+        "babylon-mtoon-material": "file:../babylon-mtoon-material",
+        "mmd-parser": "^1.0.4"
     },
     "devDependencies": {
         "@babylonjs/core": "^8.18.0",

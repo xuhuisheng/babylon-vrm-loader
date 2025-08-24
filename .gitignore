@@ -18,3 +18,9 @@ test/main.js
 test/main.js.map
 test/vendors~main.js
 test/vendors~main.js.map
+
+yarn.lock
+package-lock.json
+test/KX-YAO.vmd
+test/VRM1_Constraint_Twist_Sample.vrm
+

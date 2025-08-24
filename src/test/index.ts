@@ -9,6 +9,7 @@ import { Vector3 } from '@babylonjs/core/Maths/math';
 import { Mesh } from '@babylonjs/core/Meshes/mesh';
 import { Scene } from '@babylonjs/core/scene';
 import type { VRMManager } from '../vrm-manager';
+import { VmdAnim} from '../animation';
 
 import '@babylonjs/core/Helpers/sceneHelpers';
 import '@babylonjs/core/Meshes/Builders/sphereBuilder';
@@ -31,7 +32,7 @@ async function main() {
     camera.upperRadiusLimit = 20;
     camera.wheelDeltaPercentage = 0.01;
     camera.minZ = 0.3;
-    camera.position = new Vector3(0, 1.2, -3);
+    camera.position = new Vector3(0, 1.2, 3);
     camera.attachControl(canvas, true);
 
     scene.createDefaultEnvironment({
@@ -42,8 +43,8 @@ async function main() {
     });
 
     // Lights
-    const directionalLight = new DirectionalLight('DirectionalLight1', new Vector3(0, -0.5, 1.0), scene);
-    directionalLight.position = new Vector3(0, 25, -50);
+    const directionalLight = new DirectionalLight('DirectionalLight1', new Vector3(0, -0.5, -1.0), scene);
+    directionalLight.position = new Vector3(0, 25, 50);
     directionalLight.setEnabled(true);
     const hemisphericLight = new HemisphericLight('HemisphericLight1', new Vector3(-0.2, -0.8, -1), scene);
     hemisphericLight.setEnabled(false);
@@ -90,7 +91,13 @@ async function main() {
     window.addEventListener('resize', () => {
         engine.resize();
     });
-    await SceneLoader.AppendAsync('./', 'AliciaSolid.vrm', scene);
+    // await SceneLoader.AppendAsync('./', 'AliciaSolid.vrm', scene);
+    await SceneLoader.AppendAsync('./', 'VRM1_Constraint_Twist_Sample.vrm', scene);
+
+    //
+    const vmdAnim = new VmdAnim();
+    // console.log(vmdAnim);
+    vmdAnim.init();
 
     let fileCount = 1;
     (document.getElementById('file-input') as HTMLInputElement).addEventListener('change', (evt) => {
