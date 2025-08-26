@@ -70,7 +70,7 @@ export class BvhAnim {
     const humanoid = vrmManager.humanoidBone;
 
     const skeletonMap = detectSkeleton(skeleton);
-    // console.log('skeletonMap', skeletonMap)
+    console.log('skeletonMap', skeletonMap)
 
     const newAnimationGroup = new AnimationGroup("new-animation-group");
 
@@ -232,20 +232,46 @@ function getSpineAndHips(
       hips.getChildren()
     )
   );
-  map.set(
-    HumanoidBoneName.LeftUpperLeg,
-    selectBone(
-      (l, r) => (centerOfDescendant(l).x > centerOfDescendant(r).x ? l : r),
-      hips.getChildren()
-    )
-  );
-  map.set(
-    HumanoidBoneName.RightUpperLeg,
-    selectBone(
-      (l, r) => (centerOfDescendant(l).x < centerOfDescendant(r).x ? l : r),
-      hips.getChildren()
-    )
-  );
+  {
+    // map.set(
+    //   HumanoidBoneName.LeftUpperLeg,
+    //   selectBone(
+    //     (l, r) => (centerOfDescendant(l).x > centerOfDescendant(r).x ? l : r),
+    //     hips.getChildren()
+    //   )
+    // );
+    let bone = selectBone(
+        (l, r) => (centerOfDescendant(l).x > centerOfDescendant(r).x ? l : r),
+        hips.getChildren()
+      );
+    if (bone.id == 'LeftPelvis') {
+      bone = bone.children[0]
+    }
+    map.set(
+      HumanoidBoneName.LeftUpperLeg,
+      bone
+    );
+  }
+  {
+    // map.set(
+    //   HumanoidBoneName.RightUpperLeg,
+    //   selectBone(
+    //     (l, r) => (centerOfDescendant(l).x < centerOfDescendant(r).x ? l : r),
+    //     hips.getChildren()
+    //   )
+    // );
+    let bone = selectBone(
+        (l, r) => (centerOfDescendant(l).x < centerOfDescendant(r).x ? l : r),
+        hips.getChildren()
+      );
+    if (bone.id == 'RightPelvis') {
+      bone = bone.children[0]
+    }
+    map.set(
+      HumanoidBoneName.RightUpperLeg,
+      bone
+    );
+  }
 }
 
 function getNeckAndArms(

@@ -8,6 +8,8 @@ import { SceneLoader } from '@babylonjs/core/Loading/sceneLoader';
 import { Vector3 } from '@babylonjs/core/Maths/math';
 import { Mesh } from '@babylonjs/core/Meshes/mesh';
 import { Scene } from '@babylonjs/core/scene';
+// import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
+
 import type { VRMManager } from '../vrm-manager';
 import { BvhAnim } from '../animation';
 // import { VmdAnim } from '../animation';
@@ -16,7 +18,8 @@ import '@babylonjs/core/Helpers/sceneHelpers';
 import '@babylonjs/core/Meshes/Builders/sphereBuilder';
 import '@babylonjs/core/Meshes/Builders/torusKnotBuilder';
 import '@babylonjs/inspector';
-import { SkeletonViewer } from '@babylonjs/core/Debug/skeletonViewer';
+// import { SkeletonViewer } from '@babylonjs/core/Debug/skeletonViewer';
+// import { AxesViewer } from '@babylonjs/core/Debug/axesViewer';
 // eslint-disable-next-line import/no-internal-modules
 import '../index';
 
@@ -33,7 +36,7 @@ async function main() {
     camera.lowerRadiusLimit = 0.1;
     camera.upperRadiusLimit = 20;
     camera.wheelDeltaPercentage = 0.01;
-    camera.minZ = 0.3;
+    camera.minZ = 0.1;
     camera.position = new Vector3(0, 1.2, 3);
     camera.attachControl(canvas, true);
 
@@ -99,17 +102,35 @@ async function main() {
     //
     // const vmdAnim = new VmdAnim();
     // vmdAnim.init();
-    const bvhPath = './0018_Moonwalk001.bvh'
-    // const bvhPath = './ArmsHipHopDance_mixamo_rightYXZ_action.bvh'
+    // const bvhPath = './0018_Moonwalk001.bvh'
+    const bvhPath = './ArmsHipHopDance_mixamo_rightYXZ_action.bvh'
     // const bvhPath = './C_test.bvh'
+    // const bvhPath = './test.bvh'
     // const bvhPath = './walk-cycle.bvh'
     const bvhAnim = new BvhAnim();
     bvhAnim.init(bvhPath, scene);
 
-                const viewer = new SkeletonViewer(scene.skeletons[0], null, scene, false, 1, {
-                    displayMode: SkeletonViewer.DISPLAY_SPHERE_AND_SPURS,
-                });
-                viewer.isEnabled = true;
+                // const viewer = new SkeletonViewer(scene.skeletons[0], null, scene, false, 1, {
+                //     displayMode: SkeletonViewer.DISPLAY_SPHERE_AND_SPURS,
+                // });
+                // viewer.isEnabled = true;
+
+    // new AxesViewer(scene, 2)
+
+    // function createAxes(bone: TransformNode) {
+    //     const axes = new AxesViewer(scene, 0.1)
+    //     axes.xAxis.parent = bone;
+    //     axes.yAxis.parent = bone;
+    //     axes.zAxis.parent = bone;
+    // }
+
+    // createAxes(scene.metadata.vrmManagers[0].humanoidBone.hips)
+    // createAxes(scene.metadata.vrmManagers[0].humanoidBone.leftUpperLeg)
+    // createAxes(scene.metadata.vrmManagers[0].humanoidBone.leftLowerLeg)
+    // createAxes(scene.metadata.vrmManagers[0].humanoidBone.leftFoot)
+    // createAxes(scene.metadata.vrmManagers[0].humanoidBone.leftToes)
+
+    // console.log(scene.metadata.vrmManagers[0].humanoidBone.leftUpperLeg)
 
     let fileCount = 1;
     (document.getElementById('file-input') as HTMLInputElement).addEventListener('change', (evt) => {
