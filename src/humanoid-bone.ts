@@ -18,8 +18,13 @@ export class HumanoidBone {
 
     protected matrixMap: Map<string, Matrix> = new Map<string, Matrix>();
     protected worldMatrixMap: Map<string, Matrix> = new Map<string, Matrix>();
+    protected childRotateMap: Map<string, Quaternion> = new Map<string, Quaternion>();
+    protected parentRotateMap: Map<string, Quaternion> = new Map<string, Quaternion>();
 
     public constructor(private nodeMap: TransformNodeMap) {
+        if (Object.keys(nodeMap).length == 0) {
+            return;
+        }
         for (let nodeName of Object.keys(nodeMap)) {
             let node = nodeMap[nodeName];
             this.matrixMap.set(nodeName, Matrix.Compose(node.scaling, node.rotationQuaternion ?? new Quaternion(0, 0, 0, 1), node.position));
@@ -28,8 +33,12 @@ export class HumanoidBone {
         // tree
         const rootTransformNode = this.nodeMap['hips']?.parent as TransformNode;
         let rootParentRotation = rootTransformNode?.rotationQuaternion ?? new Quaternion(0, 0, 0, 1);
-        this.worldMatrixMap.set('root', Matrix.Compose(Vector3.One(), rootParentRotation, Vector3.One()));
-        this.calculateWorldMatrix('hips', 'root')
+        let rootMatrix = Matrix.Compose(Vector3.One(), rootParentRotation, Vector3.One());
+        this.worldMatrixMap.set('root', rootMatrix);
+        this.matrixMap.set("root", rootMatrix);
+        this.childRotateMap.set("root", rootParentRotation);
+
+        this.calculateWorldMatrix("hips", "root")
     }
 
     public calculateWorldMatrix(boneName: string, parentName: string) {
@@ -37,7 +46,12 @@ export class HumanoidBone {
         if (!childMatrix) {
             console.log(`[HumanoidBone.calculateWorldMatrix] skip child: ${boneName}, parentName: ${parentName}`);
             return;
+        } else {
+            let rotation = Quaternion.Zero();
+            childMatrix.decompose(undefined, rotation, undefined);
+            this.childRotateMap.set(boneName, rotation);
         }
+
         var parentMatrix = this.worldMatrixMap.get(parentName);
         if (parentMatrix) {
             let parentRotation = Quaternion.Zero();
@@ -52,6 +66,8 @@ export class HumanoidBone {
             rotation = parentRotation.multiply(rotation);
 
             childMatrix = Matrix.Compose(scaling, rotation, translation);
+
+            this.parentRotateMap.set(boneName, parentRotation);
         }
         this.worldMatrixMap.set(boneName, childMatrix);
 
