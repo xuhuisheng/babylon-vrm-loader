@@ -61,6 +61,7 @@ export class VRMAnimationManager10 {
 
             });
 
+            this.parentMap.set('hips', 'root');
             Object.keys(this.ext.humanoid.humanBones).forEach((key) => {
                 let value = this.ext.humanoid.humanBones[key];
                 if (!value) {
