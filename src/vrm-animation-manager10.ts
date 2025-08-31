@@ -34,6 +34,9 @@ export class VRMAnimationManager10 {
     public nodeRestPostTree: VRMNodeRestPostTree;
     public nodeRestPostTreeMap: Map<string, VRMNodeRestPostTree> = new Map<string, VRMNodeRestPostTree>();
 
+    public hipsNodeIndex = -1;
+    public hipsParent: Matrix;
+
     public constructor(
         public readonly ext: IVRMAnimation,
         public readonly loader: GLTFLoader,
@@ -48,6 +51,8 @@ export class VRMAnimationManager10 {
 
         this.constructNodeRestPostTree();
         this.constructKeyFrames();
+
+        this.findHipsParent();
     }
 
     public constructIndex() {
@@ -61,7 +66,6 @@ export class VRMAnimationManager10 {
 
             });
 
-            this.parentMap.set('hips', 'root');
             Object.keys(this.ext.humanoid.humanBones).forEach((key) => {
                 let value = this.ext.humanoid.humanBones[key];
                 if (!value) {
@@ -124,17 +128,16 @@ export class VRMAnimationManager10 {
     }
 
     public constructNodeRestPostTree() {
-        let hipsNodeIndex = -1;
         this.humanoidMap.forEach((value, key) => {
             if (value == 'hips') {
-                hipsNodeIndex = key;
+                this.hipsNodeIndex = key;
             }
         })
-        if (hipsNodeIndex == -1) {
-            console.error('cannot find hips:', hipsNodeIndex);
+        if (this.hipsNodeIndex == -1) {
+            console.error('cannot find hips:', this.hipsNodeIndex);
         }
 
-        let root = this.buildNodeRestPostTree(hipsNodeIndex, true, undefined);
+        let root = this.buildNodeRestPostTree(this.hipsNodeIndex, true, undefined);
         if (root) {
             this.nodeRestPostTree = root
         }
@@ -218,6 +221,38 @@ export class VRMAnimationManager10 {
 
     public constructKeyFrames() {
         // let root = this.nodeRestPostTree;
+    }
+
+    public findHipsParent() {
+        if (!this.loader || !this.loader.gltf || !this.loader.gltf.nodes) {
+            return;
+        }
+        this.loader.gltf.nodes.forEach((node) => {
+            if (!node) {
+                return;
+            }
+            if (!node.children || node.children.length <= 0) {
+                return;
+            }
+
+            if (node.children[0] != this.hipsNodeIndex) {
+                return;
+            }
+
+            let position = Vector3.Zero();
+            if (node.translation) {
+                position = Vector3.FromArray(node.translation);
+            }
+            let rotation = Quaternion.Identity();
+            if (node.rotation) {
+                rotation = Quaternion.FromArray(node.rotation);
+            }
+            let scale = Vector3.One();
+            if (node.scale) {
+                scale = Vector3.FromArray(node.scale);
+            }
+            this.hipsParent = Matrix.Compose(scale, rotation, position);
+        });
     }
 
     public updateMatrix(assetContainer: AssetContainer) {
