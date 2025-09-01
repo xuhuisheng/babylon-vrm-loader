@@ -44,7 +44,8 @@ export class HumanoidBone {
     public calculateWorldMatrix(boneName: string, parentName: string) {
         var childMatrix = this.matrixMap.get(boneName);
         if (!childMatrix) {
-            console.log(`[HumanoidBone.calculateWorldMatrix] skip child: ${boneName}, parentName: ${parentName}`);
+            console.log(`[HumanoidBone.calculateWorldMatrix] skip child: ${boneName}, parentName: ${parentName}, try next level children`);
+            findHumanoidChildrenBones(boneName).forEach((childBoneName) => this.calculateWorldMatrix(childBoneName, parentName))
             return;
         } else {
             let rotation = Quaternion.Zero();
@@ -136,7 +137,7 @@ export class HumanoidBone {
      * 首
      */
     public get neck() {
-        return this.getMandatoryBone('neck');
+        return this.getOptionalBone('neck');
     }
     /**
      * 頭
