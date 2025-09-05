@@ -81,7 +81,14 @@ export class VRM implements IGLTFLoaderExtension {
             });
         } else if (this.loader.gltf.extensions["VRMC_vrm"]) {
             // 1.0
-            let manager = new VRMManager10(this.loader.gltf.extensions["VRMC_vrm"], this.loader.gltf.extensions["VRMC_springBone"], this.loader.babylonScene, this.meshesFrom, this.transformNodesFrom, this.materialsFrom);
+            let manager = new VRMManager10(
+                this.loader.gltf.extensions["VRMC_vrm"],
+                this.loader.gltf.extensions["VRMC_springBone"],
+                this.loader.babylonScene,
+                this.meshesFrom,
+                this.transformNodesFrom,
+                this.materialsFrom,
+                this.loader);
 
             scene.metadata = scene.metadata || {};
             scene.metadata.vrmManagers = scene.metadata.vrmManagers || [];

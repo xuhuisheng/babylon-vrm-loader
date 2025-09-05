@@ -3,6 +3,7 @@
 // import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 // import type { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
 import type { Scene } from '@babylonjs/core/scene';
+import { GLTFLoader } from '@babylonjs/loaders/glTF/2.0';
 // import type { Nullable } from '@babylonjs/core/types';
 import { SpringBoneController10 } from './secondary-animation/spring-bone-controller10';
 import { HumanoidBone } from './humanoid-bone';
@@ -10,6 +11,7 @@ import { IVRM } from './vrm-interfaces';
 import type { IVRM10, IVRMSecondaryAnimation } from './vrm-interfaces10';
 // import { MaterialValueBindingMerger } from './material-value-binding-merger';
 import { VRMManager } from './vrm-manager'
+import { VRMNodeConstraint } from './vrm-node-constraint'
 // import { IsBinaryMap, MorphTargetMap, MaterialValueBindingMergerMap, TransformNodeMap, TransformNodeCache, MeshCache, HumanBoneName } from './vrm-interfaces-defines';
 
 /**
@@ -23,13 +25,15 @@ export class VRMManager10 extends VRMManager {
     // protected transformNodeMap: TransformNodeMap = {};
     // protected transformNodeCache: TransformNodeCache = {};
     // protected meshCache: MeshCache = {};
-    // protected _humanoidBone: HumanoidBone;
+    public _humanoidBone: HumanoidBone;
     // protected _rootMesh: Mesh;
 
     // /**
     //  * Secondary Animation として定義されている VRM Spring Bone のコントローラ
     //  */
     public readonly springBoneController10: SpringBoneController10;
+
+    public readonly vrmNodeConstraint: VRMNodeConstraint;
 
     /**
      *
@@ -45,7 +49,8 @@ export class VRMManager10 extends VRMManager {
         public readonly scene: Scene,
         protected readonly meshesFrom: number,
         protected readonly transformNodesFrom: number,
-        protected readonly materialsNodesFrom: number
+        protected readonly materialsNodesFrom: number,
+        protected readonly gltfLoader: GLTFLoader
     ) {
         super(<IVRM>({} as unknown), scene, meshesFrom, transformNodesFrom, materialsNodesFrom)
 
@@ -59,11 +64,16 @@ export class VRMManager10 extends VRMManager {
         this._humanoidBone = new HumanoidBone(this.transformNodeMap);
 
         this.springBoneController10 = new SpringBoneController10(this.extSpringBone, this.findTransformNode.bind(this), this.getBone.bind(this));
+
+        this.vrmNodeConstraint = new VRMNodeConstraint(this, gltfLoader);
     }
 
     public async update(deltaTime: number): Promise<void> {
         if (this.springBoneController10) {
             await this.springBoneController10.update(deltaTime);
+        }
+        if (this.vrmNodeConstraint) {
+            await this.vrmNodeConstraint.update(deltaTime);
         }
     }
 
