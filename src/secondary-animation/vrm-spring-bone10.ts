@@ -1,8 +1,9 @@
-// import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
-// import { Color3, Vector3 } from '@babylonjs/core/Maths/math';
-// import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
+import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
+import { Color3, Vector3 } from '@babylonjs/core/Maths/math';
+import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
 import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import type { Nullable } from '@babylonjs/core/types';
+import type { Scene } from '@babylonjs/core/scene';
 import type { ColliderGroup10 } from './collider-group10';
 import { VRMSpringBoneLogic10 } from './vrm-spring-bone-logic10';
 import { VRMSpringBoneJoint10 } from './vrm-spring-bone-joint10';
@@ -15,7 +16,7 @@ export class VRMSpringBone10 {
     // private activeBones: TransformNode[] = [];
 
     /** @hidden */
-    // private drawGizmo = false;
+    private drawGizmo = true;
 
     /**
      * @see https://github.com/vrm-c/vrm-specification/tree/master/specification/0.0
@@ -58,11 +59,12 @@ export class VRMSpringBone10 {
         public readonly comment: string,
         public readonly center: Nullable<TransformNode> | undefined,
         public readonly joints: Array<Nullable<VRMSpringBoneJoint10>>,
-        public readonly colliderGroups: ColliderGroup10[]
+        public readonly colliderGroups: ColliderGroup10[],
+        public readonly scene: Scene,
         ) {
 
         this.joints.forEach((bone) => {
-            if (!bone || !bone.node) {
+            if (!bone || !bone.child) {
                 return
             }
             // [bone].concat(bone.child.getChildTransformNodes()).forEach((b) => {
@@ -71,8 +73,42 @@ export class VRMSpringBone10 {
             this.verlets.push(new VRMSpringBoneLogic10(
                 this.center ?? null,
                 bone.setting.hitRadius ?? 0.1,
-                bone.node,
+                bone.child,
                 bone));
+        });
+
+        if (this.drawGizmo) {
+            this.setupGizmo();
+        }
+    }
+
+    private setupGizmo() {
+        this.joints.forEach((bone) => {
+            if (!bone || !bone.child) {
+                return;
+            }
+            // const scene = bone.getScene();
+            // [bone].concat(bone.getChildTransformNodes()).forEach((b) => {
+                let b = bone.child;
+
+                let hitRadius = bone.setting.hitRadius ?? 0.01;
+
+                const boneGizmo = MeshBuilder.CreateSphere(
+                    b.name + '_boneGizmo',
+                    {
+                        segments: 6,
+                        diameter: hitRadius * 2,
+                        updatable: true,
+                    },
+                    this.scene
+                );
+                const mat = new StandardMaterial(b.name + '_boneGizmomat', this.scene);
+                mat.emissiveColor = Color3.Red();
+                mat.wireframe = true;
+                boneGizmo.material = mat;
+                boneGizmo.setParent(b);
+                boneGizmo.position = Vector3.Zero();
+            // });
         });
     }
 

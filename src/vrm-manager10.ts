@@ -66,7 +66,7 @@ export class VRMManager10 extends VRMManager {
 
         this._humanoidBone = new HumanoidBone(this.transformNodeMap);
 
-        this.springBoneController10 = new SpringBoneController10(this.extSpringBone, this.findTransformNode.bind(this), this.getBone.bind(this));
+        this.springBoneController10 = new SpringBoneController10(this.extSpringBone, scene, this.findTransformNode.bind(this), this.getBone.bind(this));
 
         this.vrmNodeConstraint = new VRMNodeConstraint(this, gltfLoader);
 

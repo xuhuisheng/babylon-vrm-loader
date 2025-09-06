@@ -1,6 +1,7 @@
 import { Vector3 } from '@babylonjs/core/Maths/math';
 import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import type { Nullable } from '@babylonjs/core/types';
+import type { Scene } from '@babylonjs/core/scene';
 import type { IVRMSecondaryAnimation, IVRMSecondaryAnimationSpringJoint } from '../vrm-interfaces10';
 import { ColliderGroup10 } from './collider-group10';
 import { VRMSpringBone10 } from './vrm-spring-bone10';
@@ -27,7 +28,12 @@ export class SpringBoneController10 {
      * @param ext SecondaryAnimation Object
      * @param getBone
      */
-    public constructor(public readonly ext: IVRMSecondaryAnimation, getBone: getBone, getBoneByName: getBoneByName) {
+    public constructor(
+            public readonly ext: IVRMSecondaryAnimation,
+            public readonly scene: Scene,
+            getBone: getBone,
+            getBoneByName: getBoneByName,
+            ) {
         const colliderGroups = this.constructColliderGroups(getBone, getBoneByName);
         this.springs = this.constructSprings(getBone, getBoneByName, colliderGroups);
     }
@@ -201,7 +207,8 @@ export class SpringBoneController10 {
                     spring.name,
                     center,
                     joints,
-                    springColliders
+                    springColliders,
+                    this.scene,
                 )
             );
         });

@@ -23,7 +23,7 @@ export class ColliderGroup10 {
      */
     public addCollider(offset: Vector3, tail: Vector3 | null, radius: number, transform: TransformNode) {
         const material = new StandardMaterial('cube-mtl');
-        material.wireframe = false;
+        material.wireframe = true;
 
         let type = 'sphere';
         const sphere = SphereBuilder.CreateSphere(
@@ -38,7 +38,7 @@ export class ColliderGroup10 {
         sphere.setParent(transform);
         // sphere.setPositionWithLocalVector(offset);
         sphere.position = offset;
-        sphere.setEnabled(false);
+        sphere.setEnabled(true);
         sphere.material = material;
 
         let sphereTail = null
@@ -56,7 +56,7 @@ export class ColliderGroup10 {
             sphereTail.setParent(transform);
             // sphereTail.setPositionWithLocalVector(tail);
             sphereTail.position = tail;
-            sphereTail.setEnabled(false);
+            sphereTail.setEnabled(true);
             sphereTail.material = material;
         }
 
