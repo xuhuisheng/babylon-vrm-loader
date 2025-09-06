@@ -87,7 +87,7 @@ export class VRMNodeConstraint {
                         return;
                     }
                     // node.rotationQuaternion = source.rotationQuaternion;
-                    // this.processRoll(nodeConstraint, node, source);
+                    this.processRoll(nodeConstraint, node, source);
                 }
             } catch (e) {
                 console.error(e)
@@ -106,10 +106,14 @@ export class VRMNodeConstraint {
         let dstParentWorldQuat = Quaternion.Identity();
         let invDstParentWorldQuat = Quaternion.Identity();
         if (destination.parent) {
-            let parentMatrix = destination.parent.computeWorldMatrix(true);
-            // decomposeRotation(this.destination.parent.matrixWorld, dstParentWorldQuat);
-            parentMatrix.decompose(undefined, dstParentWorldQuat, undefined);
-            // quatInvertCompat(invDstParentWorldQuat.copy(dstParentWorldQuat));
+            // console.log('node constraint', destination.name, source.name, 'destination.parent', destination.parent);
+            // let parentMatrix = destination.parent.computeWorldMatrix(true);
+            // // decomposeRotation(this.destination.parent.matrixWorld, dstParentWorldQuat);
+            // parentMatrix.decompose(undefined, dstParentWorldQuat, undefined);
+            // // quatInvertCompat(invDstParentWorldQuat.copy(dstParentWorldQuat));
+            // invDstParentWorldQuat = dstParentWorldQuat.invert();
+
+            dstParentWorldQuat = (destination.parent as TransformNode).rotationQuaternion ?? Quaternion.Identity();
             invDstParentWorldQuat = dstParentWorldQuat.invert();
         }
 
@@ -121,6 +125,9 @@ export class VRMNodeConstraint {
         ]);
         let _dstRestQuat = Quaternion.Identity();
         // const a0 = _v3A.copy(this._v3AimAxis).applyQuaternion(this._dstRestQuat).applyQuaternion(dstParentWorldQuat);
+        // console.log('node constraint', destination.name, source.name, '_v3AimAxis', _v3AimAxis);
+        // console.log('node constraint', destination.name, source.name, '_dstRestQuat', _dstRestQuat);
+        // console.log('node constraint', destination.name, source.name, 'dstParentWorldQuat', dstParentWorldQuat);
         const a0 = _v3A.copyFrom(_v3AimAxis).applyRotationQuaternion(_dstRestQuat).applyRotationQuaternion(dstParentWorldQuat);
         // const a1 = decomposePosition(this.source.matrixWorld, _v3B)
         //   .sub(decomposePosition(this.destination.matrixWorld, _v3C))
@@ -129,7 +136,9 @@ export class VRMNodeConstraint {
         let _v3C = Vector3.Zero();
         srcMatrix.decompose(undefined, undefined, _v3B);
         dstMatrix.decompose(undefined, undefined, _v3C);
+        // console.log('node constraint', destination.name, source.name, 'src pos', _v3B, 'dst pos', _v3C, 'sub', _v3B.subtract(_v3C));
         const a1 = _v3B.subtract(_v3C).normalize();
+        a1.x *= -1
 
         // const targetQuat = _quatC
         //   .setFromUnitVectors(a0, a1)
@@ -142,7 +151,9 @@ export class VRMNodeConstraint {
             .multiply(dstParentWorldQuat)
             .multiply(_dstRestQuat);
 
-        console.log('processAim dst', destination.name, 'src', source.name, targetQuat)
+        // console.log('processAim dst', destination.name, 'src', source.name, targetQuat)
+        // console.log('node constraint', destination.name, source.name, 'a0', a0, 'a1', a1, _quatC);
+        // console.log('node constraint', destination.name, source.name, '_dstRestQuat', _dstRestQuat, 'targetQuat', targetQuat);
 
         destination.rotationQuaternion = Quaternion.Slerp(_dstRestQuat, targetQuat, nodeConstraint.weight);
     }
@@ -158,10 +169,14 @@ export class VRMNodeConstraint {
         let dstParentWorldQuat = Quaternion.Identity();
         let invDstParentWorldQuat = Quaternion.Identity();
         if (destination.parent) {
-            let parentMatrix = destination.parent.computeWorldMatrix(true);
-            // decomposeRotation(this.destination.parent.matrixWorld, dstParentWorldQuat);
-            parentMatrix.decompose(undefined, dstParentWorldQuat, undefined);
-            // quatInvertCompat(invDstParentWorldQuat.copy(dstParentWorldQuat));
+            // console.log('node constraint', destination.name, source.name, 'destination.parent', destination.parent);
+            // let parentMatrix = destination.parent.computeWorldMatrix(true);
+            // // decomposeRotation(this.destination.parent.matrixWorld, dstParentWorldQuat);
+            // parentMatrix.decompose(undefined, dstParentWorldQuat, undefined);
+            // // quatInvertCompat(invDstParentWorldQuat.copy(dstParentWorldQuat));
+            // invDstParentWorldQuat = dstParentWorldQuat.invert();
+
+            dstParentWorldQuat = (destination.parent as TransformNode).rotationQuaternion ?? Quaternion.Identity();
             invDstParentWorldQuat = dstParentWorldQuat.invert();
         }
 
@@ -173,6 +188,9 @@ export class VRMNodeConstraint {
         ]);
         let _dstRestQuat = Quaternion.Identity();
         // const a0 = _v3A.copy(this._v3AimAxis).applyQuaternion(this._dstRestQuat).applyQuaternion(dstParentWorldQuat);
+        // console.log('node constraint', destination.name, source.name, '_v3AimAxis', _v3AimAxis);
+        // console.log('node constraint', destination.name, source.name, '_dstRestQuat', _dstRestQuat);
+        // console.log('node constraint', destination.name, source.name, 'dstParentWorldQuat', dstParentWorldQuat);
         const a0 = _v3A.copyFrom(_v3AimAxis).applyRotationQuaternion(_dstRestQuat).applyRotationQuaternion(dstParentWorldQuat);
         // const a1 = decomposePosition(this.source.matrixWorld, _v3B)
         //   .sub(decomposePosition(this.destination.matrixWorld, _v3C))
@@ -181,7 +199,9 @@ export class VRMNodeConstraint {
         let _v3C = Vector3.Zero();
         srcMatrix.decompose(undefined, undefined, _v3B);
         dstMatrix.decompose(undefined, undefined, _v3C);
+        // console.log('node constraint', destination.name, source.name, 'src pos', _v3B, 'dst pos', _v3C, 'sub', _v3B.subtract(_v3C));
         const a1 = _v3B.subtract(_v3C).normalize();
+        a1.x *= -1
 
         // const targetQuat = _quatC
         //   .setFromUnitVectors(a0, a1)
@@ -189,12 +209,14 @@ export class VRMNodeConstraint {
         //   .multiply(dstParentWorldQuat)
         //   .multiply(this._dstRestQuat);
         let _quatC = Quaternion.Identity();
-        Quaternion.FromUnitVectorsToRef(a1, a0, _quatC);
+        Quaternion.FromUnitVectorsToRef(a0, a1, _quatC);
         const targetQuat = invDstParentWorldQuat.multiply(_quatC)
             .multiply(dstParentWorldQuat)
             .multiply(_dstRestQuat);
 
-        console.log('processAim dst', destination.name, 'src', source.name, targetQuat)
+        // console.log('processAim dst', destination.name, 'src', source.name, targetQuat)
+        // console.log('node constraint', destination.name, source.name, 'a0', a0, 'a1', a1, _quatC);
+        // console.log('node constraint', destination.name, source.name, '_dstRestQuat', _dstRestQuat, 'targetQuat', targetQuat);
 
         destination.rotationQuaternion = Quaternion.Slerp(_dstRestQuat, targetQuat, nodeConstraint.weight);
     }
