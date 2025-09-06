@@ -163,60 +163,38 @@ export class VRMNodeConstraint {
             return;
         }
 
-        let dstMatrix = destination.computeWorldMatrix(true);
-        let srcMatrix = source.computeWorldMatrix(true);
-
-        let dstParentWorldQuat = Quaternion.Identity();
-        let invDstParentWorldQuat = Quaternion.Identity();
-        if (destination.parent) {
-            // console.log('node constraint', destination.name, source.name, 'destination.parent', destination.parent);
-            // let parentMatrix = destination.parent.computeWorldMatrix(true);
-            // // decomposeRotation(this.destination.parent.matrixWorld, dstParentWorldQuat);
-            // parentMatrix.decompose(undefined, dstParentWorldQuat, undefined);
-            // // quatInvertCompat(invDstParentWorldQuat.copy(dstParentWorldQuat));
-            // invDstParentWorldQuat = dstParentWorldQuat.invert();
-
-            dstParentWorldQuat = (destination.parent as TransformNode).rotationQuaternion ?? Quaternion.Identity();
-            invDstParentWorldQuat = dstParentWorldQuat.invert();
-        }
-
-        let _v3A = Vector3.Zero();
-        let _v3AimAxis = Vector3.FromArray([
-            nodeConstraint.aimAxis === 'PositiveX' ? 1.0 : nodeConstraint.aimAxis === 'NegativeX' ? -1.0 : 0.0,
-            nodeConstraint.aimAxis === 'PositiveY' ? 1.0 : nodeConstraint.aimAxis === 'NegativeY' ? -1.0 : 0.0,
-            nodeConstraint.aimAxis === 'PositiveZ' ? 1.0 : nodeConstraint.aimAxis === 'NegativeZ' ? -1.0 : 0.0,
+        let _v3RollAxis = Vector3.FromArray([
+            nodeConstraint.rollAxis === 'X' ? 1.0 : 0.0,
+            nodeConstraint.rollAxis === 'Y' ? 1.0 : 0.0,
+            nodeConstraint.rollAxis === 'Z' ? 1.0 : 0.0
         ]);
+
+
+        let _quatA = Quaternion.Identity();
+        let _quatB = Quaternion.Identity();
+        let _v3A = Vector3.Zero();
+
         let _dstRestQuat = Quaternion.Identity();
-        // const a0 = _v3A.copy(this._v3AimAxis).applyQuaternion(this._dstRestQuat).applyQuaternion(dstParentWorldQuat);
-        // console.log('node constraint', destination.name, source.name, '_v3AimAxis', _v3AimAxis);
-        // console.log('node constraint', destination.name, source.name, '_dstRestQuat', _dstRestQuat);
-        // console.log('node constraint', destination.name, source.name, 'dstParentWorldQuat', dstParentWorldQuat);
-        const a0 = _v3A.copyFrom(_v3AimAxis).applyRotationQuaternion(_dstRestQuat).applyRotationQuaternion(dstParentWorldQuat);
-        // const a1 = decomposePosition(this.source.matrixWorld, _v3B)
-        //   .sub(decomposePosition(this.destination.matrixWorld, _v3C))
-        //   .normalize();
-        let _v3B = Vector3.Zero();
-        let _v3C = Vector3.Zero();
-        srcMatrix.decompose(undefined, undefined, _v3B);
-        dstMatrix.decompose(undefined, undefined, _v3C);
-        // console.log('node constraint', destination.name, source.name, 'src pos', _v3B, 'dst pos', _v3C, 'sub', _v3B.subtract(_v3C));
-        const a1 = _v3B.subtract(_v3C).normalize();
-        a1.x *= -1
+        let _invDstRestQuat = _dstRestQuat.invert();
+        let _invSrcRestQuatMulDstRestQuat = Quaternion.Identity();
+        if (source && source.rotationQuaternion && source.rotationQuaternion.multiply(_dstRestQuat)) {
+            _invSrcRestQuatMulDstRestQuat = source.rotationQuaternion.multiply(_dstRestQuat).invert();
+        }
+        let sourceQuaternion = source.rotationQuaternion ?? Quaternion.Identity();
 
-        // const targetQuat = _quatC
-        //   .setFromUnitVectors(a0, a1)
-        //   .premultiply(invDstParentWorldQuat)
-        //   .multiply(dstParentWorldQuat)
-        //   .multiply(this._dstRestQuat);
-        let _quatC = Quaternion.Identity();
-        Quaternion.FromUnitVectorsToRef(a0, a1, _quatC);
-        const targetQuat = invDstParentWorldQuat.multiply(_quatC)
-            .multiply(dstParentWorldQuat)
-            .multiply(_dstRestQuat);
+        const quatDelta = _quatA
+          .copyFrom(_invDstRestQuat)
+          .multiply(sourceQuaternion)
+          .multiply(_invSrcRestQuatMulDstRestQuat);
 
-        // console.log('processAim dst', destination.name, 'src', source.name, targetQuat)
-        // console.log('node constraint', destination.name, source.name, 'a0', a0, 'a1', a1, _quatC);
-        // console.log('node constraint', destination.name, source.name, '_dstRestQuat', _dstRestQuat, 'targetQuat', targetQuat);
+        // const n1 = _v3A.copyFrom(_v3RollAxis).applyQuaternion(quatDelta);
+        const n1 = _v3A.copyFrom(_v3RollAxis).applyRotationQuaternion(quatDelta);
+
+        // const quatFromTo = _quatB.setFromUnitVectors(n1, _v3RollAxis);
+        const quatFromTo = Quaternion.FromUnitVectorsToRef(n1, _v3RollAxis, _quatB);
+
+        // const targetQuat = quatFromTo.premultiply(this._dstRestQuat).multiply(quatDelta);
+        const targetQuat = _dstRestQuat.multiply(quatFromTo).multiply(quatDelta);
 
         destination.rotationQuaternion = Quaternion.Slerp(_dstRestQuat, targetQuat, nodeConstraint.weight);
     }
