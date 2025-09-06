@@ -58,7 +58,7 @@ export class VRMLookAt {
     }
 
     public lookAt(position: Vector3): void {
-        console.log('look at', 'position', position);
+        // console.log('look at', 'position', position);
         let _quatA = Quaternion.Identity();
         let _quatB = Quaternion.Identity();
         let _v3B = Vector3.Zero();
@@ -117,9 +117,9 @@ export class VRMLookAt {
 
         // console.log('look at', 'RAD2DEG', RAD2DEG);
 
-        console.log('look at', 'yaw', yaw, 'pitch', pitch);
+        // console.log('look at', 'yaw', yaw, 'pitch', pitch);
 
-        console.log('look at', 'yaw', this._yaw, 'pitch', this._pitch);
+        // console.log('look at', 'yaw', this._yaw, 'pitch', this._pitch);
 
         // // yaw 沿 y 轴旋转，左手坐标系（感觉又不是左手坐标系？）从第一视角，正数向左看，负数向右看
         // this._yaw = -10;
@@ -144,10 +144,10 @@ export class VRMLookAt {
     }
 
     public applyYawPitch(yaw: number, pitch: number) {
-        console.log('yaw', yaw, 'pitch', pitch);
+        // console.log('lookAt', 'applyYawPitch', 'yaw', yaw, 'pitch', pitch);
 
         let leftEye = this.vrmManager.humanoidBone.leftEye;
-        // let rightEye = this.vrmManager.humanoidBone.rightEye;
+        let rightEye = this.vrmManager.humanoidBone.rightEye;
 
         // left
         if (leftEye) {
@@ -155,25 +155,25 @@ export class VRMLookAt {
             let y = 0;
           if (pitch < 0.0) {
             // _eulerA.x = -this.DEG2RAD * this.rangeMapVerticalDown.map(-pitch);
-            x = -DEG2RAD * (-pitch);
+            x = -DEG2RAD * this.map(-pitch, 10.0, 90.0);
           } else {
             // _eulerA.x = this.DEG2RAD * this.rangeMapVerticalUp.map(pitch);
-            x = DEG2RAD * (pitch);
+            x = DEG2RAD * this.map(pitch, 10.0, 90.0);
           }
 
           if (yaw < 0.0) {
             // _eulerA.y = -this.DEG2RAD * this.rangeMapHorizontalInner.map(-yaw);
-            y = -DEG2RAD * (-yaw);
+            y = -DEG2RAD * this.map(-yaw, 10.0, 90.0);
           } else {
             // _eulerA.y = this.DEG2RAD * this.rangeMapHorizontalOuter.map(yaw);
-            y = DEG2RAD * (yaw);
+            y = DEG2RAD * this.map(yaw, 10.0, 90.0);
           }
 
           // _quatA.setFromEuler(_eulerA);
           // let _quatA = Quaternion.RotationYawPitchRoll(x, y, 0);
           let _quatA = Quaternion.RotationYawPitchRoll(y, x, 0);
-        
-            console.log('look at', '_quatA', this.dumpQuaternion(_quatA), _quatA);
+
+            // console.log('look at', '_quatA', this.dumpQuaternion(_quatA), _quatA);
 
           let _quatB = Quaternion.Identity();
           this._getWorldFaceFrontQuat(_quatB);
@@ -186,6 +186,9 @@ export class VRMLookAt {
 
           // _quatA.copy(this._restLeftEyeParentWorldQuat);
           _quatA.copyFrom(this._restLeftEyeParentWorldQuat);
+
+            // console.log('look at', 'left', 'x', x, 'y', y);
+            // console.log('look at', 'left', '_quatA', this.dumpQuaternion(_quatA), _quatA);
 
           // _quatA^-1 * leftEyeNormalized.quaternion * _quatA * restQuatLeftEye
           // where _quatA is restLeftEyeParentWorldQuat
@@ -201,8 +204,65 @@ export class VRMLookAt {
             )
             .multiply(this._restQuatLeftEye);
         
-            console.log('look at', 'this._restQuatLeftEye', this.dumpQuaternion(this._restQuatLeftEye), this._restQuatLeftEye);
-            console.log('look at', 'leftEye.rotationQuaternion', this.dumpQuaternion(leftEye.rotationQuaternion), leftEye.rotationQuaternion);
+            // console.log('look at', 'this._restQuatLeftEye', this.dumpQuaternion(this._restQuatLeftEye), this._restQuatLeftEye);
+            // console.log('look at', 'leftEye.rotationQuaternion', this.dumpQuaternion(leftEye.rotationQuaternion), leftEye.rotationQuaternion);
+        }
+
+        // right
+        if (rightEye) {
+            let x = 0;
+            let y = 0;
+          if (pitch < 0.0) {
+            // _eulerA.x = -this.DEG2RAD * this.rangeMapVerticalDown.map(-pitch);
+            x = -DEG2RAD * this.map(-pitch, 10.0, 90.0);
+          } else {
+            // _eulerA.x = this.DEG2RAD * this.rangeMapVerticalUp.map(pitch);
+            x = DEG2RAD * this.map(pitch, 10.0, 90.0);
+          }
+
+          if (yaw < 0.0) {
+            // _eulerA.y = -this.DEG2RAD * this.rangeMapHorizontalInner.map(-yaw);
+            y = -DEG2RAD * this.map(-yaw, 10.0, 90.0);
+          } else {
+            // _eulerA.y = this.DEG2RAD * this.rangeMapHorizontalOuter.map(yaw);
+            y = DEG2RAD * this.map(yaw, 10.0, 90.0);
+          }
+
+          // _quatA.setFromEuler(_eulerA);
+          // let _quatA = Quaternion.RotationYawPitchRoll(x, y, 0);
+          let _quatA = Quaternion.RotationYawPitchRoll(y, x, 0);
+
+            // console.log('look at', 'right', 'x', x, 'y', y);
+            // console.log('look at', 'right', '_quatA', this.dumpQuaternion(_quatA), _quatA);
+
+          let _quatB = Quaternion.Identity();
+          this._getWorldFaceFrontQuat(_quatB);
+
+          // _quatB * _quatA * _quatB^-1
+          // where _quatA is LookAt rotation
+          // and _quatB is worldFaceFrontQuat
+          // leftEyeNormalized!.quaternion.copy(_quatB).multiply(_quatA).multiply(_quatB.invert());
+          let rightEyeNormalized = _quatB.multiply(_quatA).multiply(_quatB.invert());
+
+          // _quatA.copy(this._restLeftEyeParentWorldQuat);
+          _quatA.copyFrom(this._restRightEyeParentWorldQuat);
+
+          // _quatA^-1 * leftEyeNormalized.quaternion * _quatA * restQuatLeftEye
+          // where _quatA is restLeftEyeParentWorldQuat
+          // leftEye.quaternion
+          //   .copy(leftEyeNormalized!.quaternion)
+          //   .multiply(_quatA)
+          //   .premultiply(_quatA.invert())
+          //   .multiply(this._restQuatLeftEye);
+          rightEye.rotationQuaternion =
+            _quatA.invert().multiply(
+                rightEyeNormalized
+                .multiply(_quatA)
+            )
+            .multiply(this._restQuatRightEye);
+
+            // console.log('look at', 'this._restQuatLeftEye', this.dumpQuaternion(this._restQuatLeftEye), this._restQuatLeftEye);
+            // console.log('look at', 'leftEye.rotationQuaternion', this.dumpQuaternion(leftEye.rotationQuaternion), leftEye.rotationQuaternion);
         }
     }
 
@@ -226,21 +286,9 @@ export class VRMLookAt {
         let position = Vector3.Zero();
         matrix.decompose(undefined, rotate, position);
 
-
-          // rotate.x = -0.5
-          // rotate.y = -0.5
-          // rotate.z = -0.5
-          // rotate.w = 0.5
-
-        // const head = this.humanoid.getRawBoneNode('head')!;
-        // return target.copy(this.offsetFromHeadBone).applyMatrix4(head.matrixWorld);
-
         const v1 = this.offsetFromHeadBone.applyRotationQuaternion(rotate ?? Quaternion.Identity());
 
         const v2 = v1.add(position);
-
-        // console.log('head', 'head', head)
-        // console.log('head', 'head.position', position)
 
         return v2;
     }
@@ -272,6 +320,18 @@ export class VRMLookAt {
     // return target.setFromEuler(_eulerA);
     return Quaternion.RotationYawPitchRoll(0.0, 0.5 * Math.PI + faceFrontAzimuth, faceFrontAltitude);
   }
+
+  // public map(src: number): number {
+  //   return this.outputScale * saturate(src / this.inputMaxValue);
+  // }
+
+  public map(src: number, outputScale: number, inputMaxValue: number): number {
+    return outputScale * this.saturate(src / inputMaxValue);
+  }
+
+    public saturate(value: number): number {
+      return Math.max(Math.min(value, 1.0), 0.0);
+    }
 
     public dumpQuaternion(r: Quaternion): string {
         let euler = r.toEulerAngles();
