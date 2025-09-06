@@ -73,12 +73,12 @@ export class VRMLookAt {
           .copyFrom(this._restHeadWorldQuaternion)
           .multiply(this.quatInvertCompat(this.getLookAtWorldQuaternion(_quatB)));
 
-          console.log('_quatA', _quatA)
-          console.log('this._restHeadWorldQuaternion', this._restHeadWorldQuaternion)
-          console.log('_quatB', _quatB)
-          console.log('this.getLookAtWorldQuaternion(_quatB)', this.getLookAtWorldQuaternion(_quatB))
-          console.log('this.quatInvertCompat(this.getLookAtWorldQuaternion(_quatB))', this.quatInvertCompat(this.getLookAtWorldQuaternion(_quatB)))
-          console.log('headRotDiffInv', headRotDiffInv)
+          // console.log('_quatA', _quatA)
+          // console.log('this._restHeadWorldQuaternion', this._restHeadWorldQuaternion)
+          // console.log('_quatB', _quatB)
+          // console.log('this.getLookAtWorldQuaternion(_quatB)', this.getLookAtWorldQuaternion(_quatB))
+          // console.log('this.quatInvertCompat(this.getLookAtWorldQuaternion(_quatB))', this.quatInvertCompat(this.getLookAtWorldQuaternion(_quatB)))
+          // console.log('headRotDiffInv', headRotDiffInv)
 
           // headRotDiffInv.x = 0
           // headRotDiffInv.y = 0
@@ -112,7 +112,7 @@ export class VRMLookAt {
 
 
         // apply angles
-        this._yaw = RAD2DEG * yaw;
+        this._yaw = -RAD2DEG * yaw;
         this._pitch = RAD2DEG * pitch;
 
         // console.log('look at', 'RAD2DEG', RAD2DEG);
