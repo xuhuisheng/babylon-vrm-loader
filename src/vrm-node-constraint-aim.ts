@@ -3,7 +3,7 @@
 // import type { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
 // import type { Scene } from '@babylonjs/core/scene';
 // import type { AssetContainer } from '@babylonjs/core/assetContainer';
-// import { Quaternion } from '@babylonjs/core/Maths/math';
+import { Quaternion } from '@babylonjs/core/Maths/math';
 // import { Vector3 } from '@babylonjs/core/Maths/math';
 // import { Matrix } from '@babylonjs/core/Maths/math';
 // import type { Nullable } from '@babylonjs/core/types';
@@ -17,8 +17,6 @@ export class VRMNodeConstraintAim {
     public weight: number;
     public aimAxis: string;
     public rollAxis: string;
-
-    public update(deltaTime: number) {
-    }
+    public _dstRestQuat: Quaternion;
 
 }
