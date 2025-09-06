@@ -16,7 +16,7 @@ export class VRMSpringBone10 {
     // private activeBones: TransformNode[] = [];
 
     /** @hidden */
-    private drawGizmo = true;
+    private drawGizmo = false;
 
     /**
      * @see https://github.com/vrm-c/vrm-specification/tree/master/specification/0.0

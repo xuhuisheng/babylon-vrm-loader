@@ -15,6 +15,9 @@ export class ColliderGroup10 {
      */
     // public constructor(public readonly transform: TransformNode) {}
 
+    /** @hidden */
+    private drawGizmo = false;
+
     /**
      * Add offsetted collider
      *
@@ -22,8 +25,9 @@ export class ColliderGroup10 {
      * @param radius The radius of the collider.
      */
     public addCollider(offset: Vector3, tail: Vector3 | null, radius: number, transform: TransformNode) {
+
         const material = new StandardMaterial('cube-mtl');
-        material.wireframe = true;
+        material.wireframe = this.drawGizmo;
 
         let type = 'sphere';
         const sphere = SphereBuilder.CreateSphere(
@@ -38,7 +42,7 @@ export class ColliderGroup10 {
         sphere.setParent(transform);
         // sphere.setPositionWithLocalVector(offset);
         sphere.position = offset;
-        sphere.setEnabled(true);
+        sphere.setEnabled(this.drawGizmo);
         sphere.material = material;
 
         let sphereTail = null
@@ -56,7 +60,7 @@ export class ColliderGroup10 {
             sphereTail.setParent(transform);
             // sphereTail.setPositionWithLocalVector(tail);
             sphereTail.position = tail;
-            sphereTail.setEnabled(true);
+            sphereTail.setEnabled(this.drawGizmo);
             sphereTail.material = material;
         }
 

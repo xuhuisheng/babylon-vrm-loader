@@ -146,10 +146,10 @@ export class SpringBoneController10 {
                     //         : undefined,
                     // };
                     const setting: VRMSpringBoneJointSetting10 = new VRMSpringBoneJointSetting10(
-                        prevSchemaJoint.hitRadius != null ? prevSchemaJoint.hitRadius : 0.5,
-                        prevSchemaJoint.dragForce != null ? prevSchemaJoint.dragForce : 0.5,
-                        prevSchemaJoint.gravityPower != null ? prevSchemaJoint.gravityPower : 1,
-                        prevSchemaJoint.stiffness != null ? prevSchemaJoint.stiffness : 0.5,
+                        prevSchemaJoint.hitRadius ?? 0.0,
+                        prevSchemaJoint.dragForce ?? 0.4,
+                        prevSchemaJoint.gravityPower ?? 0.0,
+                        prevSchemaJoint.stiffness ?? 1.0,
                           prevSchemaJoint.gravityDir != null
                             ? Vector3.FromArray(prevSchemaJoint.gravityDir)
                             : new Vector3(0, -1, 0),
