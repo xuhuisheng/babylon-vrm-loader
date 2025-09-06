@@ -12,6 +12,7 @@ import type { IVRM10, IVRMSecondaryAnimation } from './vrm-interfaces10';
 // import { MaterialValueBindingMerger } from './material-value-binding-merger';
 import { VRMManager } from './vrm-manager'
 import { VRMNodeConstraint } from './vrm-node-constraint'
+import { VRMLookAt } from './vrm-look-at'
 // import { IsBinaryMap, MorphTargetMap, MaterialValueBindingMergerMap, TransformNodeMap, TransformNodeCache, MeshCache, HumanBoneName } from './vrm-interfaces-defines';
 
 /**
@@ -34,6 +35,8 @@ export class VRMManager10 extends VRMManager {
     public readonly springBoneController10: SpringBoneController10;
 
     public readonly vrmNodeConstraint: VRMNodeConstraint;
+
+    public readonly vrmLookAt: VRMLookAt;
 
     /**
      *
@@ -66,14 +69,19 @@ export class VRMManager10 extends VRMManager {
         this.springBoneController10 = new SpringBoneController10(this.extSpringBone, this.findTransformNode.bind(this), this.getBone.bind(this));
 
         this.vrmNodeConstraint = new VRMNodeConstraint(this, gltfLoader);
+
+        this.vrmLookAt = new VRMLookAt(this, gltfLoader);
     }
 
     public async update(deltaTime: number): Promise<void> {
+        if (this.vrmNodeConstraint) {
+            await this.vrmNodeConstraint.update(deltaTime);
+        }
         if (this.springBoneController10) {
             await this.springBoneController10.update(deltaTime);
         }
-        if (this.vrmNodeConstraint) {
-            await this.vrmNodeConstraint.update(deltaTime);
+        if (this.vrmLookAt) {
+            await this.vrmLookAt.update(deltaTime);
         }
     }
 
