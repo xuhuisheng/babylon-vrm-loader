@@ -118,13 +118,13 @@ export class VRMManager10 extends VRMManager {
             g.morphTargetBinds.forEach((b) => {
                 const meshes = this.findMeshes(b.node);
                 if (!meshes) {
-                    console.log(`Undefined BlendShapeBind Mesh`, b);
+                    console.log(`[vrm-animation-manager.constructIndex] Undefined BlendShapeBind Mesh`, b);
                     return;
                 }
                 meshes.forEach((mesh) => {
                     const morphTargetManager = mesh.morphTargetManager;
                     if (!morphTargetManager) {
-                        console.log(`Undefined morphTargetManager`, b);
+                        console.log(`[vrm-animation-manager.constructIndex] Undefined morphTargetManager`, b);
                         return;
                     }
                     const target = morphTargetManager.getTarget(b.index);
